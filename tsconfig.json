@@ -37,6 +37,7 @@
         "./pages",
         "./step-definitions",
         "./support",
-        "./node_modules/@sap_oss/wdio-qmate-service/**/*.d.ts"
+        "./node_modules/@sap_oss/wdio-qmate-service/**/*.d.ts",
+        "interfaces"
     ]
 }

@@ -1,4 +1,4 @@
-import type { Product } from '../support/productInterface.js';
+import type { Product } from '../interfaces/productInterface.js';
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 import { BasePage } from './BasePage.js';
 
@@ -137,28 +137,19 @@ class WorklistPage extends BasePage {
         await ui5.userInteraction.click(WorklistPage.ORDER_BUTTON_SELECTOR);
     }
 
-    async isProductInList(productName: string): Promise<boolean> {
-        const index = await this.getProductIndexByName(productName);
-        return index !== -1;
-    }
-
-    async getProductIndexByName(productName: string): Promise<number> {
+    async getAllProducts(): Promise<Product[]> {
         const products = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_NAME_SELECTOR);
+        const productList: Product[] = [];
         for (let i = 0; i < products.length; i++) {
-            const name = await this.getProductName(i);
-            if (name === productName) {
-                return i;
-            }
+            const product = await this.getProductDetails(i);
+            productList.push(product);
         }
-        return -1;
+        return productList;
     }
 
-    async getProductDetailsByName(productName: string): Promise<Product | null> {
-        const index = await this.getProductIndexByName(productName);
-        if (index === -1) {
-            return null;
-        }
-        return await this.getProductDetails(index);
+    async findProductDetailsByName(productName: string): Promise<Product | null> {
+        const products = await this.getAllProducts();
+        return products.find(product => product.name === productName) || null;
     }
 }
 

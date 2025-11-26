@@ -1,6 +1,6 @@
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 import { BasePage } from './BasePage.js';
-import type { Product } from '../support/productInterface.js';
+import type { Product } from '../interfaces/productInterface.js';
 
 class ProductDetailsPage extends BasePage {
 

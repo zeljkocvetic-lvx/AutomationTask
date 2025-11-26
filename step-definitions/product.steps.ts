@@ -2,7 +2,8 @@ import { Given, When, Then } from '@wdio/cucumber-framework';
 import { attachScreenshot } from '../helpers/screenShotHelper.js';
 import WorklistPage from '../pages/WorklistPage.js';
 import ProductDetailsPage from '../pages/ProductDetailsPage.js';
-import type { Product } from '../support/productInterface.js';
+import type { Product } from '../interfaces/productInterface.js';
+import type { ProductCategory } from '../interfaces/productCategory.js';
 
 // Background
 Given('Open the app {string}', async function (url: string) {
@@ -70,7 +71,7 @@ Then('The product should appear in the list with increased units', async functio
     const products = this.getProducts();
     const originalProduct = products[0];
 
-    const currentProduct = await WorklistPage.getProductDetailsByName(originalProduct.name);
+    const currentProduct = await WorklistPage.findProductDetailsByName(originalProduct.name);
     await common.assertion.expectDefined(currentProduct);
 
     const originalUnits = parseFloat(originalProduct.unitsInStock);

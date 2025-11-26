@@ -1,5 +1,5 @@
 import { setWorldConstructor } from '@wdio/cucumber-framework';
-import type { Product } from './productInterface.js';
+import type { Product } from '../interfaces/productInterface.js';
 
 export class CustomWorld {
     private addedProducts: Product[];
