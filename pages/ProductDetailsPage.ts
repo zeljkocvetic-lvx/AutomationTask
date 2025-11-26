@@ -4,6 +4,14 @@ import type { Product } from '../support/productInterface.js';
 
 class ProductDetailsPage extends BasePage {
 
+    private static readonly PAGE_TITLE_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Object",
+            metadata: "sap.f.DynamicPageTitle",
+            id: "*page-pageTitle"
+        }
+    };
+
     private static readonly PRODUCT_NAME_SELECTOR: QmateSelector = {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Object",
@@ -23,11 +31,6 @@ class ProductDetailsPage extends BasePage {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Object",
             metadata: "sap.m.Text"
-        },
-        ancestorProperties: {
-            viewName: "mycompany.myapp.MyWorklistApp.view.Object",
-            metadata: "sap.m.Panel",
-            headerText: [{ path: "i18n>ObjectPricingTabTitle" }]
         }
     };
 
@@ -40,7 +43,7 @@ class ProductDetailsPage extends BasePage {
     };
 
     async waitForPageLoaded(): Promise<void> {
-        await ui5.element.getDisplayed(ProductDetailsPage.PRODUCT_NAME_SELECTOR);
+        await ui5.element.getDisplayed(ProductDetailsPage.PAGE_TITLE_SELECTOR);
     }
 
     async getProductName(): Promise<string> {
@@ -52,10 +55,14 @@ class ProductDetailsPage extends BasePage {
     }
 
     async getPrice(): Promise<string> {
-        const element = await ui5.element.getDisplayed(ProductDetailsPage.PRICE_SELECTOR);
-        const text = await element.getText();
-        const match = text.match(/[\d.]+/);
-        return match ? match[0] : text;
+        const textElements = await ui5.element.getAllDisplayed(ProductDetailsPage.PRICE_SELECTOR);
+        for (const element of textElements) {
+            const text = await element.getText();
+            if (text.includes("Price:")) {
+                return text.replace(/[^\d.]/g, "");
+            }
+        }
+        throw new Error("Price text not found on product details page");
     }
 
     async getUnitsInStock(): Promise<string> {
@@ -70,10 +77,6 @@ class ProductDetailsPage extends BasePage {
         const unitsInStock = await this.getUnitsInStock();
 
         return { name, supplier, price, unitsInStock };
-    }
-
-    async goBack(): Promise<void> {
-        await common.userInteraction.pressKey("Escape");
     }
 }
 
