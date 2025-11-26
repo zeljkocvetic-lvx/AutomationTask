@@ -4,6 +4,7 @@ import WorklistPage from '../pages/WorklistPage.js';
 import ProductDetailsPage from '../pages/ProductDetailsPage.js';
 import type { Product } from '../interfaces/productInterface.js';
 import type { ProductCounts } from '../interfaces/productCounts.js';
+import type { ProductCategory } from '../interfaces/productCategory.js';
 
 // Background
 Given('Open the app {string}', async function (url: string) {
@@ -83,14 +84,14 @@ Then('The product should appear in the list with increased units', async functio
 // Scenario 3 - Product Deletion
 Given('I note the total products count and {string} category count', async function (category: string) {
     const totalCount = await WorklistPage.getTotalProductsCount();
-    const categoryCount = await WorklistPage.getCategoryCount(category);
+    const categoryCount = await WorklistPage.getCategoryCount(category as ProductCategory);
     const counts: ProductCounts = { total: totalCount, category: categoryCount };
     this.setProductCounts(counts);
     await attachScreenshot(`Initial Counts Noted: Total=${totalCount}, ${category}=${categoryCount}`);
 });
 
 Given('I select product at index {int} from {string} category', async function (_productIndex: number, category: string) {
-    await WorklistPage.clickCategoryTab(category);
+    await WorklistPage.clickCategoryTab(category as ProductCategory);
     await attachScreenshot(`Selected ${category} tab`);
 });
 
@@ -120,7 +121,7 @@ Then('The {string} category count should decrease by 1', async function (categor
         throw new Error('Product counts were not stored');
     }
 
-    const currentCategoryCount = await WorklistPage.getCategoryCount(category);
+    const currentCategoryCount = await WorklistPage.getCategoryCount(category as ProductCategory);
     const expectedCategoryCount = originalCounts.category - 1;
 
     await common.assertion.expectEqual(currentCategoryCount, expectedCategoryCount);

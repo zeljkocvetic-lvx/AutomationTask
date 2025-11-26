@@ -1,4 +1,5 @@
 import type { Product } from '../interfaces/productInterface.js';
+import type { ProductCategory } from '../interfaces/productCategory.js';
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 import { BasePage } from './BasePage.js';
 
@@ -72,6 +73,24 @@ class WorklistPage extends BasePage {
             text: "Order"
         }
     };
+
+    private getCategoryConfig(category: ProductCategory) {
+        const configs: Record<ProductCategory, { selector: QmateSelector; clickMethod: () => Promise<void> }> = {
+            'Shortage': {
+                selector: WorklistPage.SHORTAGE_TAB_SELECTOR,
+                clickMethod: () => this.clickShortageTab()
+            },
+            'Plenty in Stock': {
+                selector: WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR,
+                clickMethod: () => this.clickPlentyInStockTab()
+            }
+        };
+        const config = configs[category];
+        if (!config) {
+            throw new Error(`Unknown category: ${category}`);
+        }
+        return config;
+    }
 
     private static readonly REMOVE_BUTTON_SELECTOR: QmateSelector = {
         elementProperties: {
@@ -226,33 +245,15 @@ class WorklistPage extends BasePage {
         return parseInt(countText, 10);
     }
 
-    async getCategoryCount(category: string): Promise<number> {
-        let selector: QmateSelector;
-        switch (category) {
-            case 'Shortage':
-                selector = WorklistPage.SHORTAGE_TAB_SELECTOR;
-                break;
-            case 'Plenty in Stock':
-                selector = WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR;
-                break;
-            default:
-                throw new Error(`Unknown category: ${category}`);
-        }
-        const countText = await ui5.element.getPropertyValue(selector, "count");
+    async getCategoryCount(category: ProductCategory): Promise<number> {
+        const config = this.getCategoryConfig(category);
+        const countText = await ui5.element.getPropertyValue(config.selector, "count");
         return parseInt(countText, 10);
     }
 
-    async clickCategoryTab(category: string): Promise<void> {
-        switch (category) {
-            case 'Shortage':
-                await this.clickShortageTab();
-                break;
-            case 'Plenty in Stock':
-                await this.clickPlentyInStockTab();
-                break;
-            default:
-                throw new Error(`Unknown category: ${category}`);
-        }
+    async clickCategoryTab(category: ProductCategory): Promise<void> {
+        const config = this.getCategoryConfig(category);
+        await config.clickMethod();
         await this.waitForPageLoaded();
     }
 
@@ -271,3 +272,4 @@ class WorklistPage extends BasePage {
 }
 
 export default new WorklistPage();
+
