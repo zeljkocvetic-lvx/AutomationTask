@@ -13,17 +13,13 @@ Feature: Product Management in SAP UI5 Worklist Application
         Then The product details page should display matching information for all fields
 
     @scenario2
-    Scenario Outline: Product Order Flow
-        Given I note product "<product_name>" from the Shortage list with "<initial_units>" units
-        When I order the product
-        Then The product should be removed from the Shortage list
-        And The product should appear in the Plenty in Stock list
-        And The Units in Stock value should be greater than "<initial_units>"
-
-        Examples:
-            | product_name    | initial_units |
-            | Shortage Item 1 | 5             |
-            | Shortage Item 2 | 3             |
+    Scenario: Product Order Flow
+        Given I click on the Shortage tab
+        And I select the first product checkbox
+        And I note the product details
+        When I click the Order button
+        Then I click on the Plenty in Stock tab
+        And The product should appear in the list with increased units
 
     @scenario3
     Scenario Outline: Product Deletion

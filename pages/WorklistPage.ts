@@ -42,6 +42,37 @@ class WorklistPage extends BasePage {
         }
     };
 
+    private static readonly SHORTAGE_TAB_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.IconTabFilter",
+            text: [{ path: "i18n>WorklistFilterShortage" }]
+        }
+    };
+
+    private static readonly PLENTY_IN_STOCK_TAB_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.IconTabFilter",
+            text: [{ path: "i18n>WorklistFilterInStock" }]
+        }
+    };
+
+    private static readonly PRODUCT_CHECKBOX_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.CheckBox"
+        }
+    };
+
+    private static readonly ORDER_BUTTON_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.Button",
+            text: "Order"
+        }
+    };
+
 
 
     async open(url: string): Promise<void> {
@@ -87,7 +118,49 @@ class WorklistPage extends BasePage {
     }
 
     async waitForPageLoaded(): Promise<void> {
-        //await ui5.element.getDisplayed(WorklistPage.COLUMN_TITLE_SELECTOR);
+        await ui5.element.getDisplayed(WorklistPage.PRODUCT_NAME_SELECTOR);
+    }
+
+    async clickShortageTab(): Promise<void> {
+        await ui5.userInteraction.click(WorklistPage.SHORTAGE_TAB_SELECTOR);
+        await this.waitForPageLoaded();
+    }
+
+    async clickPlentyInStockTab(): Promise<void> {
+        await ui5.userInteraction.click(WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR);
+        await this.waitForPageLoaded();
+    }
+
+    async selectFirstProductCheckbox(): Promise<void> {
+        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, 0);
+    }
+
+    async clickOrderButton(): Promise<void> {
+        await ui5.userInteraction.click(WorklistPage.ORDER_BUTTON_SELECTOR);
+    }
+
+    async isProductInList(productName: string): Promise<boolean> {
+        const index = await this.getProductIndexByName(productName);
+        return index !== -1;
+    }
+
+    async getProductIndexByName(productName: string): Promise<number> {
+        const products = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_NAME_SELECTOR);
+        for (let i = 0; i < products.length; i++) {
+            const name = await this.getProductName(i);
+            if (name === productName) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    async getProductDetailsByName(productName: string): Promise<Product | null> {
+        const index = await this.getProductIndexByName(productName);
+        if (index === -1) {
+            return null;
+        }
+        return await this.getProductDetails(index);
     }
 }
 

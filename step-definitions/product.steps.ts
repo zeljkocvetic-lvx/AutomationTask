@@ -37,24 +37,44 @@ Then('The product details page should display matching information for all field
 });
 
 // Scenario 2 - Product Order Flow
-Given('I note product {string} from the Shortage list with {string} units', async function (_productName: string, _units: string) {
-    await attachScreenshot('Shortage Product Noted');
+Given('I click on the Shortage tab', async function () {
+    await WorklistPage.clickShortageTab();
+    await attachScreenshot('Shortage Tab Clicked');
 });
 
-When('I order the product', async function () {
-    await attachScreenshot('Product Ordered');
+Given('I select the first product checkbox', async function () {
+    await WorklistPage.selectFirstProductCheckbox();
+    await attachScreenshot('First Product Checkbox Selected');
 });
 
-Then('The product should be removed from the Shortage list', async function () {
-    await attachScreenshot('Product Removed from Shortage List');
+Given('I note the product details', async function () {
+    const productInfo = await WorklistPage.getProductDetails();
+    this.addProductToStorage(productInfo);
+    await attachScreenshot(`Product Noted: ${productInfo.name} with ${productInfo.unitsInStock} units`);
 });
 
-Then('The product should appear in the Plenty in Stock list', async function () {
-    await attachScreenshot('Product Appears in Plenty in Stock List');
+When('I click the Order button', async function () {
+    await WorklistPage.clickOrderButton();
+    await attachScreenshot('Order Button Clicked');
 });
 
-Then('The Units in Stock value should be greater than {string}', async function (_initialUnits: string) {
-    await attachScreenshot('Units in Stock Increased');
+Then('I click on the Plenty in Stock tab', async function () {
+    await WorklistPage.clickPlentyInStockTab();
+    await attachScreenshot('Plenty in Stock Tab Clicked');
+});
+
+Then('The product should appear in the list with increased units', async function () {
+    const products = this.getProducts();
+    const originalProduct = products[0];
+
+    const currentProduct = await WorklistPage.getProductDetailsByName(originalProduct.name);
+    await common.assertion.expectDefined(currentProduct);
+
+    const originalUnits = parseFloat(originalProduct.unitsInStock);
+    const currentUnits = parseFloat(currentProduct!.unitsInStock);
+
+    await common.assertion.expectTrue(currentUnits > originalUnits);
+    await attachScreenshot(`Units increased from ${originalUnits} to ${currentUnits}`);
 });
 
 // Scenario 3 - Product Deletion
