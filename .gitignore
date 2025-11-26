@@ -1,0 +1,21 @@
+# Node dependencies
+node_modules/
+
+# Allure test results and reports
+allure-results/
+allure-report/
+node_modules/
+*.allure
+package-lock.json
+package.json
+
+# Logs
+logs/
+*.log
+
+# Environment files
+.env
+
+# System / editor files
+.DS_Store
+.vscode/
