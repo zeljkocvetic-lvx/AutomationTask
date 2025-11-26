@@ -108,6 +108,10 @@ class WorklistPage extends BasePage {
         await ui5.userInteraction.click(WorklistPage.PRODUCT_NAME_SELECTOR, 0);
     }
 
+    async clickProductByIndex(index: number): Promise<void> {
+        await ui5.userInteraction.click(WorklistPage.PRODUCT_NAME_SELECTOR, index);
+    }
+
     async searchProduct(productName: string): Promise<void> {
         await ui5.userInteraction.searchFor(WorklistPage.SEARCH_FIELD_SELECTOR, productName);
     }
@@ -130,7 +134,16 @@ class WorklistPage extends BasePage {
     }
 
     async selectFirstProductCheckbox(): Promise<void> {
-        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, 0);
+        const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
+        if (allCheckboxes.length === 0) {
+            throw new Error('No checkboxes found in the list');
+        }
+        const firstProductCheckboxIndex = allCheckboxes.length > 1 ? 1 : 0;
+        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, firstProductCheckboxIndex);
+    }
+
+    async selectProductCheckboxByIndex(index: number): Promise<void> {
+        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, index);
     }
 
     async clickOrderButton(): Promise<void> {
@@ -147,9 +160,35 @@ class WorklistPage extends BasePage {
         return productList;
     }
 
-    async findProductDetailsByName(productName: string): Promise<Product | null> {
+    async findProductDetailsByName(productName: string): Promise<Product> {
         const products = await this.getAllProducts();
-        return products.find(product => product.name === productName) || null;
+        const product = products.find(product => product.name === productName);
+        if (!product) {
+            throw new Error(`Product "${productName}" not found in the list`);
+        }
+        return product;
+    }
+
+    async findProductIndexByName(productName: string): Promise<number> {
+        const products = await this.getAllProducts();
+        const index = products.findIndex(product => product.name === productName);
+        return index;
+    }
+
+    async clickProductByName(productName: string): Promise<void> {
+        const index = await this.findProductIndexByName(productName);
+        if (index === -1) {
+            throw new Error(`Product "${productName}" not found in the list`);
+        }
+        await this.clickProductByIndex(index);
+    }
+
+    async selectProductCheckboxByName(productName: string): Promise<void> {
+        const index = await this.findProductIndexByName(productName);
+        if (index === -1) {
+            throw new Error(`Product "${productName}" not found in the list`);
+        }
+        await this.selectProductCheckboxByIndex(index);
     }
 }
 

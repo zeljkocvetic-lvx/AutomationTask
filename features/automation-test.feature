@@ -16,7 +16,7 @@ Feature: Product Management in SAP UI5 Worklist Application
     Scenario: Product Order Flow
         Given I click on the Shortage tab
         And I select the first product checkbox
-        And I note the product details
+        And I note the first product details
         When I click the Order button
         Then I click on the Plenty in Stock tab
         And The product should appear in the list with increased units

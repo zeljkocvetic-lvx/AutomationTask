@@ -3,7 +3,6 @@ import { attachScreenshot } from '../helpers/screenShotHelper.js';
 import WorklistPage from '../pages/WorklistPage.js';
 import ProductDetailsPage from '../pages/ProductDetailsPage.js';
 import type { Product } from '../interfaces/productInterface.js';
-import type { ProductCategory } from '../interfaces/productCategory.js';
 
 // Background
 Given('Open the app {string}', async function (url: string) {
@@ -11,18 +10,17 @@ Given('Open the app {string}', async function (url: string) {
     await WorklistPage.waitForPageLoaded();
 });
 
-// Scenario 1 - Product Info Consistency (Dynamic)
+// Scenario 1 - Product Info Consistency
 When('I select the first product from the worklist', async function () {
-    const worklistProductInfo = await WorklistPage.getProductDetails();
+    const worklistProductInfo = await WorklistPage.getProductDetails(0);
     this.addProductToStorage(worklistProductInfo);
-    await attachScreenshot(`Product Info Captured: ${worklistProductInfo.name}`);
 
-    await WorklistPage.clickFirstProduct();
+    await WorklistPage.clickProductByIndex(0);
     await ProductDetailsPage.waitForPageLoaded();
 
     const detailsProductInfo = await ProductDetailsPage.getProductInfo();
     this.addProductToStorage(detailsProductInfo);
-    await attachScreenshot('Product Details Page Loaded');
+    await attachScreenshot(`Product Details Page Loaded: ${worklistProductInfo.name}`);
 });
 
 Then('The product details page should display matching information for all fields', async function () {
@@ -50,14 +48,15 @@ Given('I select the first product checkbox', async function () {
     await attachScreenshot('First Product Checkbox Selected');
 });
 
-Given('I note the product details', async function () {
-    const productInfo = await WorklistPage.getProductDetails();
+Given('I note the first product details', async function () {
+    const productInfo = await WorklistPage.getProductDetails(0);
     this.addProductToStorage(productInfo);
     await attachScreenshot(`Product Noted: ${productInfo.name} with ${productInfo.unitsInStock} units`);
 });
 
 When('I click the Order button', async function () {
     await WorklistPage.clickOrderButton();
+    await WorklistPage.waitForPageLoaded();
     await attachScreenshot('Order Button Clicked');
 });
 
@@ -72,10 +71,9 @@ Then('The product should appear in the list with increased units', async functio
     const originalProduct = products[0];
 
     const currentProduct = await WorklistPage.findProductDetailsByName(originalProduct.name);
-    await common.assertion.expectDefined(currentProduct);
 
     const originalUnits = parseFloat(originalProduct.unitsInStock);
-    const currentUnits = parseFloat(currentProduct!.unitsInStock);
+    const currentUnits = parseFloat(currentProduct.unitsInStock);
 
     await common.assertion.expectTrue(currentUnits > originalUnits);
     await attachScreenshot(`Units increased from ${originalUnits} to ${currentUnits}`);
@@ -118,6 +116,6 @@ Then('Only products matching {string} should be displayed', async function (_sea
 
 Then('The result count should be {string}', async function (expectedCount: string) {
     const actualCount = await WorklistPage.getVisibleProductCount();
-    common.assertion.expectEqual(actualCount.toString(), expectedCount);
+    await common.assertion.expectEqual(actualCount.toString(), expectedCount);
     await attachScreenshot(`Result Count Verified: ${expectedCount}`);
 });
