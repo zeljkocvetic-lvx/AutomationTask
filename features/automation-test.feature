@@ -36,16 +36,17 @@ Feature: Product Management in SAP UI5 Worklist Application
     @scenario3
     Scenario Outline: Product Deletion
         Given I note the total products count and "<category>" category count
-        And I select product "<product_name>" from "<category>" category
-        When I delete the product
+        And I select product at index <product_index> from "<category>" category
+        And I note the product details at index <product_index>
+        When I delete the product at index <product_index>
         Then The total number of products should decrease by 1
         And The "<category>" category count should decrease by 1
-        And Product "<product_name>" should not be displayed in any listing
+        And The product should not be displayed in any listing
 
         Examples:
-            | product_name | category        |
-            | Product X    | Plenty in Stock |
-            | Product Y    | Shortage        |
+            | product_index | category |
+            | 0             | Shortage |
+            | 1             | Shortage |
 
     @scenario4
     Scenario Outline: Product Search

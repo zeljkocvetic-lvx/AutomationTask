@@ -73,6 +73,23 @@ class WorklistPage extends BasePage {
         }
     };
 
+    private static readonly REMOVE_BUTTON_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.Button",
+            text: "Remove"
+        }
+    };
+
+    private static readonly TOTAL_PRODUCTS_TAB_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.IconTabFilter",
+            text: [{ path: "i18n>WorklistFilterProductsAll" }]
+        }
+    };
+
+
 
 
     async open(url: string): Promise<void> {
@@ -201,6 +218,54 @@ class WorklistPage extends BasePage {
     private validateProductIndex(index: number, productName: string): void {
         if (index === -1) {
             throw new Error(`Product "${productName}" not found in the list`);
+        }
+    }
+
+    async getTotalProductsCount(): Promise<number> {
+        const countText = await ui5.element.getPropertyValue(WorklistPage.TOTAL_PRODUCTS_TAB_SELECTOR, "count");
+        return parseInt(countText, 10);
+    }
+
+    async getCategoryCount(category: string): Promise<number> {
+        let selector: QmateSelector;
+        switch (category) {
+            case 'Shortage':
+                selector = WorklistPage.SHORTAGE_TAB_SELECTOR;
+                break;
+            case 'Plenty in Stock':
+                selector = WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR;
+                break;
+            default:
+                throw new Error(`Unknown category: ${category}`);
+        }
+        const countText = await ui5.element.getPropertyValue(selector, "count");
+        return parseInt(countText, 10);
+    }
+
+    async clickCategoryTab(category: string): Promise<void> {
+        switch (category) {
+            case 'Shortage':
+                await this.clickShortageTab();
+                break;
+            case 'Plenty in Stock':
+                await this.clickPlentyInStockTab();
+                break;
+            default:
+                throw new Error(`Unknown category: ${category}`);
+        }
+        await this.waitForPageLoaded();
+    }
+
+    async clickRemoveButtonByIndex(index: number): Promise<void> {
+        await ui5.userInteraction.click(WorklistPage.REMOVE_BUTTON_SELECTOR, index);
+    }
+
+    async isProductInList(productName: string): Promise<boolean> {
+        try {
+            await this.findProductDetailsByName(productName);
+            return true;
+        } catch {
+            return false;
         }
     }
 }

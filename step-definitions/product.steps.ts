@@ -3,6 +3,7 @@ import { attachScreenshot } from '../helpers/screenShotHelper.js';
 import WorklistPage from '../pages/WorklistPage.js';
 import ProductDetailsPage from '../pages/ProductDetailsPage.js';
 import type { Product } from '../interfaces/productInterface.js';
+import type { ProductCounts } from '../interfaces/productCounts.js';
 
 // Background
 Given('Open the app {string}', async function (url: string) {
@@ -80,28 +81,68 @@ Then('The product should appear in the list with increased units', async functio
 });
 
 // Scenario 3 - Product Deletion
-Given('I note the total products count and {string} category count', async function (_category: string) {
-    await attachScreenshot('Initial Counts Noted');
+Given('I note the total products count and {string} category count', async function (category: string) {
+    const totalCount = await WorklistPage.getTotalProductsCount();
+    const categoryCount = await WorklistPage.getCategoryCount(category);
+    const counts: ProductCounts = { total: totalCount, category: categoryCount };
+    this.setProductCounts(counts);
+    await attachScreenshot(`Initial Counts Noted: Total=${totalCount}, ${category}=${categoryCount}`);
 });
 
-Given('I select product {string} from {string} category', async function (_productName: string, _category: string) {
-    await attachScreenshot('Product Selected');
+Given('I select product at index {int} from {string} category', async function (_productIndex: number, category: string) {
+    await WorklistPage.clickCategoryTab(category);
+    await attachScreenshot(`Selected ${category} tab`);
 });
 
-When('I delete the product', async function () {
-    await attachScreenshot('Product Deleted');
+When('I delete the product at index {int}', async function (productIndex: number) {
+    await WorklistPage.selectProductCheckboxByIndex(productIndex);
+    await WorklistPage.clickRemoveButtonByIndex(0);
+    await WorklistPage.waitForPageLoaded();
+    await attachScreenshot(`Product at index ${productIndex} deleted`);
 });
 
 Then('The total number of products should decrease by 1', async function () {
-    await attachScreenshot('Total Products Decreased');
+    const originalCounts = this.getProductCounts();
+    if (!originalCounts) {
+        throw new Error('Product counts were not stored');
+    }
+
+    const currentTotalCount = await WorklistPage.getTotalProductsCount();
+    const expectedTotalCount = originalCounts.total - 1;
+
+    await common.assertion.expectEqual(currentTotalCount, expectedTotalCount);
+    await attachScreenshot(`Total products decreased from ${originalCounts.total} to ${currentTotalCount}`);
 });
 
-Then('The {string} category count should decrease by 1', async function (_category: string) {
-    await attachScreenshot('Category Count Decreased');
+Then('The {string} category count should decrease by 1', async function (category: string) {
+    const originalCounts = this.getProductCounts();
+    if (!originalCounts) {
+        throw new Error('Product counts were not stored');
+    }
+
+    const currentCategoryCount = await WorklistPage.getCategoryCount(category);
+    const expectedCategoryCount = originalCounts.category - 1;
+
+    await common.assertion.expectEqual(currentCategoryCount, expectedCategoryCount);
+    await attachScreenshot(`${category} count decreased from ${originalCounts.category} to ${currentCategoryCount}`);
 });
 
-Then('Product {string} should not be displayed in any listing', async function (_productName: string) {
-    await attachScreenshot('Product Not Displayed');
+Then('The product should not be displayed in any listing', async function () {
+    const products = this.getProducts();
+    const deletedProduct = products[products.length - 1];
+
+    const isInAllTab = await WorklistPage.isProductInList(deletedProduct.name);
+    await WorklistPage.clickShortageTab();
+    await WorklistPage.waitForPageLoaded();
+    const isInShortageTab = await WorklistPage.isProductInList(deletedProduct.name);
+    await WorklistPage.clickPlentyInStockTab();
+    await WorklistPage.waitForPageLoaded();
+    const isInPlentyTab = await WorklistPage.isProductInList(deletedProduct.name);
+
+    await common.assertion.expectFalse(isInAllTab);
+    await common.assertion.expectFalse(isInShortageTab);
+    await common.assertion.expectFalse(isInPlentyTab);
+    await attachScreenshot(`Product "${deletedProduct.name}" verified as not in any listing`);
 });
 
 // Scenario 4 - Product Search
