@@ -39,7 +39,8 @@ class WorklistPage extends BasePage {
     private static readonly SEARCH_FIELD_SELECTOR: QmateSelector = {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-            metadata: "sap.m.SearchField"
+            metadata: "sap.m.SearchField",
+            id: "*searchField"
         }
     };
 
@@ -267,6 +268,15 @@ class WorklistPage extends BasePage {
             return true;
         } catch {
             return false;
+        }
+    }
+
+    async verifyAllProductsMatchSearchTerm(searchTerm: string): Promise<void> {
+        const products = await this.getAllProducts();
+        for (const product of products) {
+            if (!product.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+                throw new Error(`Product "${product.name}" does not match search term "${searchTerm}"`);
+            }
         }
     }
 }

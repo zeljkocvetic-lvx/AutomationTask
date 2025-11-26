@@ -50,11 +50,13 @@ Feature: Product Management in SAP UI5 Worklist Application
 
     @scenario4
     Scenario Outline: Product Search
-        When I search for product "<search_term>"
-        Then Only products matching "<search_term>" should be displayed
-        And The result count should be "<expected_count>"
+        Given I note the product name at index <product_index>
+        When I search for the stored product name
+        Then Only products matching the search query should be displayed
+        And The result count should be 1
 
         Examples:
-            | search_term | expected_count |
-            | Product A   | 1              |
-            | Widget      | 3              |
+            | product_index |
+            | 0             |
+            | 2             |
+            | 1             |

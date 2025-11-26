@@ -147,17 +147,29 @@ Then('The product should not be displayed in any listing', async function () {
 });
 
 // Scenario 4 - Product Search
-When('I search for product {string}', async function (searchTerm: string) {
-    await WorklistPage.searchProduct(searchTerm);
-    await attachScreenshot(`Searched for "${searchTerm}"`);
+Given('I note the product name at index {int}', async function (productIndex: number) {
+    const productInfo = await WorklistPage.getProductDetails(productIndex);
+    this.addProductToStorage(productInfo);
+    await attachScreenshot(`Product name noted: ${productInfo.name}`);
 });
 
-Then('Only products matching {string} should be displayed', async function (_searchTerm: string) {
-    await attachScreenshot('Search Results Verified');
+When('I search for the stored product name', async function () {
+    const products = this.getProducts();
+    const productToSearch = products[products.length - 1];
+    await WorklistPage.searchProduct(productToSearch.name);
+    await WorklistPage.waitForPageLoaded();
+    await attachScreenshot(`Searched for "${productToSearch.name}"`);
 });
 
-Then('The result count should be {string}', async function (expectedCount: string) {
+Then('Only products matching the search query should be displayed', async function () {
+    const products = this.getProducts();
+    const searchTerm = products[products.length - 1].name;
+    await WorklistPage.verifyAllProductsMatchSearchTerm(searchTerm);
+    await attachScreenshot(`Verified all products match search term: "${searchTerm}"`);
+});
+
+Then('The result count should be {int}', async function (expectedCount: number) {
     const actualCount = await WorklistPage.getVisibleProductCount();
-    await common.assertion.expectEqual(actualCount.toString(), expectedCount);
-    await attachScreenshot(`Result Count Verified: ${expectedCount}`);
+    await common.assertion.expectEqual(actualCount, expectedCount);
+    await attachScreenshot(`Result Count Verified: ${actualCount}`);
 });
