@@ -11,11 +11,11 @@ Given('Open the app {string}', async function (url: string) {
 });
 
 // Scenario 1 - Product Info Consistency
-When('I select the first product from the worklist', async function () {
-    const worklistProductInfo = await WorklistPage.getProductDetails(0);
+When('I select product at index {int} from the worklist', async function (productIndex: number) {
+    const worklistProductInfo = await WorklistPage.getProductDetails(productIndex);
     this.addProductToStorage(worklistProductInfo);
 
-    await WorklistPage.clickProductByIndex(0);
+    await WorklistPage.clickProductByIndex(productIndex);
     await ProductDetailsPage.waitForPageLoaded();
 
     const detailsProductInfo = await ProductDetailsPage.getProductInfo();
@@ -43,13 +43,13 @@ Given('I click on the Shortage tab', async function () {
     await attachScreenshot('Shortage Tab Clicked');
 });
 
-Given('I select the first product checkbox', async function () {
-    await WorklistPage.selectFirstProductCheckbox();
-    await attachScreenshot('First Product Checkbox Selected');
+Given('I select product checkbox at index {int}', async function (productIndex: number) {
+    await WorklistPage.selectProductCheckboxByIndex(productIndex);
+    await attachScreenshot(`Product Checkbox Selected at index ${productIndex}`);
 });
 
-Given('I note the first product details', async function () {
-    const productInfo = await WorklistPage.getProductDetails(0);
+Given('I note the product details at index {int}', async function (productIndex: number) {
+    const productInfo = await WorklistPage.getProductDetails(productIndex);
     this.addProductToStorage(productInfo);
     await attachScreenshot(`Product Noted: ${productInfo.name} with ${productInfo.unitsInStock} units`);
 });

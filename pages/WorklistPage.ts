@@ -142,8 +142,13 @@ class WorklistPage extends BasePage {
         await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, firstProductCheckboxIndex);
     }
 
-    async selectProductCheckboxByIndex(index: number): Promise<void> {
-        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, index);
+    async selectProductCheckboxByIndex(productIndex: number): Promise<void> {
+        const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
+        if (allCheckboxes.length === 0) {
+            throw new Error('No checkboxes found in the list');
+        }
+        const checkboxIndex = allCheckboxes.length > 1 ? productIndex + 1 : productIndex;
+        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, checkboxIndex);
     }
 
     async clickOrderButton(): Promise<void> {

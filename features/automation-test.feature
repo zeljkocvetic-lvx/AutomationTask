@@ -8,18 +8,30 @@ Feature: Product Management in SAP UI5 Worklist Application
         Given Open the app "https://sdk.openui5.org/test-resources/sap/m/demokit/tutorial/worklist/07/webapp/test/mockServer.html?sap-ui-theme=sap_horizon"
 
     @scenario1
-    Scenario: Product Info Consistency
-        When I select the first product from the worklist
+    Scenario Outline: Product Info Consistency
+        When I select product at index <product_index> from the worklist
         Then The product details page should display matching information for all fields
 
+        Examples:
+            | product_index |
+            | 0             |
+            | 2             |
+            | 1             |
+
     @scenario2
-    Scenario: Product Order Flow
+    Scenario Outline: Product Order Flow
         Given I click on the Shortage tab
-        And I select the first product checkbox
-        And I note the first product details
+        And I select product checkbox at index <product_index>
+        And I note the product details at index <product_index>
         When I click the Order button
         Then I click on the Plenty in Stock tab
         And The product should appear in the list with increased units
+
+        Examples:
+            | product_index |
+            | 0             |
+            | 2             |
+            | 1             |
 
     @scenario3
     Scenario Outline: Product Deletion
