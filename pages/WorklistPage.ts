@@ -123,12 +123,10 @@ class WorklistPage extends BasePage {
 
     async clickShortageTab(): Promise<void> {
         await ui5.userInteraction.click(WorklistPage.SHORTAGE_TAB_SELECTOR);
-        await this.waitForPageLoaded();
     }
 
     async clickPlentyInStockTab(): Promise<void> {
         await ui5.userInteraction.click(WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR);
-        await this.waitForPageLoaded();
     }
 
     async selectFirstProductCheckbox(): Promise<void> {

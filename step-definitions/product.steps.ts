@@ -7,6 +7,7 @@ import type { Product } from '../support/productInterface.js';
 // Background
 Given('Open the app {string}', async function (url: string) {
     await WorklistPage.open(url);
+    await WorklistPage.waitForPageLoaded();
 });
 
 // Scenario 1 - Product Info Consistency (Dynamic)
@@ -39,6 +40,7 @@ Then('The product details page should display matching information for all field
 // Scenario 2 - Product Order Flow
 Given('I click on the Shortage tab', async function () {
     await WorklistPage.clickShortageTab();
+    await WorklistPage.waitForPageLoaded();
     await attachScreenshot('Shortage Tab Clicked');
 });
 
@@ -60,6 +62,7 @@ When('I click the Order button', async function () {
 
 Then('I click on the Plenty in Stock tab', async function () {
     await WorklistPage.clickPlentyInStockTab();
+    await WorklistPage.waitForPageLoaded();
     await attachScreenshot('Plenty in Stock Tab Clicked');
 });
 
