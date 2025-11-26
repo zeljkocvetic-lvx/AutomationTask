@@ -135,19 +135,15 @@ class WorklistPage extends BasePage {
 
     async selectFirstProductCheckbox(): Promise<void> {
         const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
-        if (allCheckboxes.length === 0) {
-            throw new Error('No checkboxes found in the list');
-        }
-        const firstProductCheckboxIndex = allCheckboxes.length > 1 ? 1 : 0;
+        this.validateCheckboxesExist(allCheckboxes);
+        const firstProductCheckboxIndex = this.calculateCheckboxIndex(0, allCheckboxes.length);
         await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, firstProductCheckboxIndex);
     }
 
     async selectProductCheckboxByIndex(productIndex: number): Promise<void> {
         const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
-        if (allCheckboxes.length === 0) {
-            throw new Error('No checkboxes found in the list');
-        }
-        const checkboxIndex = allCheckboxes.length > 1 ? productIndex + 1 : productIndex;
+        this.validateCheckboxesExist(allCheckboxes);
+        const checkboxIndex = this.calculateCheckboxIndex(productIndex, allCheckboxes.length);
         await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, checkboxIndex);
     }
 
@@ -182,18 +178,30 @@ class WorklistPage extends BasePage {
 
     async clickProductByName(productName: string): Promise<void> {
         const index = await this.findProductIndexByName(productName);
-        if (index === -1) {
-            throw new Error(`Product "${productName}" not found in the list`);
-        }
+        this.validateProductIndex(index, productName);
         await this.clickProductByIndex(index);
     }
 
     async selectProductCheckboxByName(productName: string): Promise<void> {
         const index = await this.findProductIndexByName(productName);
+        this.validateProductIndex(index, productName);
+        await this.selectProductCheckboxByIndex(index);
+    }
+
+    private validateCheckboxesExist(checkboxes: unknown[]): void {
+        if (checkboxes.length === 0) {
+            throw new Error('No checkboxes found in the list');
+        }
+    }
+
+    private calculateCheckboxIndex(productIndex: number, totalCheckboxes: number): number {
+        return totalCheckboxes > 1 ? productIndex + 1 : productIndex;
+    }
+
+    private validateProductIndex(index: number, productName: string): void {
         if (index === -1) {
             throw new Error(`Product "${productName}" not found in the list`);
         }
-        await this.selectProductCheckboxByIndex(index);
     }
 }
 
