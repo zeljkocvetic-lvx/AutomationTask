@@ -9,8 +9,8 @@ Feature: Product Management in SAP UI5 Worklist Application
 
     @scenario1
     Scenario Outline: Product Info Consistency
-        When I select product at index <product_index> from the worklist
-        Then The product details page should display matching information for all fields
+        When Select product at index <product_index> from the worklist
+        Then Verify product details page displays matching information for all fields
 
         Examples:
             | product_index |
@@ -20,12 +20,12 @@ Feature: Product Management in SAP UI5 Worklist Application
 
     @scenario2
     Scenario Outline: Product Order Flow
-        Given I click on the Shortage tab
-        And I select product checkbox at index <product_index>
-        And I note the product details at index <product_index>
-        When I click the Order button
-        Then I click on the Plenty in Stock tab
-        And The product should appear in the list with increased units
+        Given Click on the Shortage tab
+        And Select product checkbox at index <product_index>
+        And Note the product details at index <product_index>
+        When Click the Order button
+        Then Click on the Plenty in Stock tab
+        And Verify the product appears in the list with increased units
 
         Examples:
             | product_index |
@@ -35,13 +35,13 @@ Feature: Product Management in SAP UI5 Worklist Application
 
     @scenario3
     Scenario Outline: Product Deletion
-        Given I note the total products count and "<category>" category count
-        And I select product at index <product_index> from "<category>" category
-        And I note the product details at index <product_index>
-        When I delete the product at index <product_index>
-        Then The total number of products should decrease by 1
-        And The "<category>" category count should decrease by 1
-        And The product should not be displayed in any listing
+        Given Note the total products count and <category> category count
+        And Select product at index <product_index> from <category> category
+        And Note the product details at index <product_index>
+        When Delete the product at index <product_index>
+        Then Verify the total number of products decreased by 1
+        And Verify the <category> category count decreased by 1
+        And Verify the product is not displayed in any listing
 
         Examples:
             | product_index | category |
@@ -50,10 +50,10 @@ Feature: Product Management in SAP UI5 Worklist Application
 
     @scenario4
     Scenario Outline: Product Search
-        Given I note the product name at index <product_index>
-        When I search for the stored product name
-        Then Only products matching the search query should be displayed
-        And The result count should be 1
+        Given Note the product name at index <product_index>
+        When Search for the stored product name
+        Then Verify only products matching the search query are displayed
+        And Verify the result count is 1
 
         Examples:
             | product_index |
