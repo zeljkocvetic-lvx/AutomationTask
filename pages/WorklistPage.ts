@@ -6,7 +6,7 @@ import { CategoryOperations } from './operations/CategoryOperations.js';
 import { ActionOperations } from './operations/ActionOperations.js';
 
 class WorklistPage extends BasePage {
-
+    // Product-related selectors
     private static readonly PRODUCT_NAME_SELECTOR: QmateSelector = {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
@@ -46,6 +46,7 @@ class WorklistPage extends BasePage {
         }
     };
 
+    // Category-related selectors
     private static readonly SHORTAGE_TAB_SELECTOR: QmateSelector = {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
@@ -62,6 +63,15 @@ class WorklistPage extends BasePage {
         }
     };
 
+    private static readonly TOTAL_PRODUCTS_TAB_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.IconTabFilter",
+            text: [{ path: "i18n>WorklistFilterProductsAll" }]
+        }
+    };
+
+    // Action-related selectors
     private static readonly PRODUCT_CHECKBOX_SELECTOR: QmateSelector = {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
@@ -77,20 +87,11 @@ class WorklistPage extends BasePage {
         }
     };
 
-
     private static readonly REMOVE_BUTTON_SELECTOR: QmateSelector = {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
             metadata: "sap.m.Button",
             text: "Remove"
-        }
-    };
-
-    private static readonly TOTAL_PRODUCTS_TAB_SELECTOR: QmateSelector = {
-        elementProperties: {
-            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-            metadata: "sap.m.IconTabFilter",
-            text: [{ path: "i18n>WorklistFilterProductsAll" }]
         }
     };
 
@@ -119,88 +120,108 @@ class WorklistPage extends BasePage {
         );
     }
 
+    // Core page methods
     async open(url: string): Promise<void> {
         await common.navigation.navigateToUrl(url);
-    }
-
-    async getProductName(index: number = 0): Promise<string> {
-        return await this.productOperations.getProductName(index);
-    }
-
-    async getProductSupplier(index: number = 0): Promise<string> {
-        return await this.productOperations.getProductSupplier(index);
-    }
-
-    async getProductPrice(index: number = 0): Promise<string> {
-        return await this.productOperations.getProductPrice(index);
-    }
-
-    async getProductUnitsInStock(index: number = 0): Promise<string> {
-        return await this.productOperations.getProductUnitsInStock(index);
-    }
-
-    async getProductDetails(index: number = 0): Promise<Product> {
-        return await this.productOperations.getProductDetails(index);
-    }
-
-    async clickFirstProduct(): Promise<void> {
-        return await this.productOperations.clickFirstProduct();
-    }
-
-    async clickProductByIndex(index: number): Promise<void> {
-        return await this.productOperations.clickProductByIndex(index);
-    }
-
-    async searchProduct(productName: string): Promise<void> {
-        return await this.productOperations.searchProduct(productName);
-    }
-
-    async getVisibleProductCount(): Promise<number> {
-        return await this.productOperations.getVisibleProductCount();
     }
 
     async waitForPageLoaded(): Promise<void> {
         await ui5.element.getDisplayed(WorklistPage.PRODUCT_NAME_SELECTOR);
     }
 
-    async clickShortageTab(): Promise<void> {
-        return await this.categoryOperations.clickShortageTab();
+    // Product Operations - Delegated
+    async getProductName(index: number = 0): Promise<string> {
+        return this.productOperations.getProductName(index);
     }
 
-    async clickPlentyInStockTab(): Promise<void> {
-        return await this.categoryOperations.clickPlentyInStockTab();
+    async getProductSupplier(index: number = 0): Promise<string> {
+        return this.productOperations.getProductSupplier(index);
     }
 
-    async selectFirstProductCheckbox(): Promise<void> {
-        return await this.actionOperations.selectFirstProductCheckbox();
+    async getProductPrice(index: number = 0): Promise<string> {
+        return this.productOperations.getProductPrice(index);
     }
 
-    async selectProductCheckboxByIndex(productIndex: number): Promise<void> {
-        return await this.actionOperations.selectProductCheckboxByIndex(productIndex);
+    async getProductUnitsInStock(index: number = 0): Promise<string> {
+        return this.productOperations.getProductUnitsInStock(index);
     }
 
-    async clickOrderButton(): Promise<void> {
-        return await this.actionOperations.clickOrderButton();
+    async getProductDetails(index: number = 0): Promise<Product> {
+        return this.productOperations.getProductDetails(index);
     }
 
-    async getAllProducts(): Promise<Product[]> {
-        return await this.productOperations.getAllProducts();
+    async clickFirstProduct(): Promise<void> {
+        return this.productOperations.clickFirstProduct();
     }
 
-    async findProductDetailsByName(productName: string): Promise<Product> {
-        return await this.productOperations.findProductDetailsByName(productName);
-    }
-
-    async findProductIndexByName(productName: string): Promise<number> {
-        return await this.productOperations.findProductIndexByName(productName);
+    async clickProductByIndex(index: number): Promise<void> {
+        return this.productOperations.clickProductByIndex(index);
     }
 
     async clickProductByName(productName: string): Promise<void> {
-        return await this.productOperations.clickProductByName(productName);
+        return this.productOperations.clickProductByName(productName);
+    }
+
+    async searchProduct(productName: string): Promise<void> {
+        return this.productOperations.searchProduct(productName);
+    }
+
+    async getVisibleProductCount(): Promise<number> {
+        return this.productOperations.getVisibleProductCount();
+    }
+
+    async getAllProducts(): Promise<Product[]> {
+        return this.productOperations.getAllProducts();
+    }
+
+    async findProductDetailsByName(productName: string): Promise<Product> {
+        return this.productOperations.findProductDetailsByName(productName);
+    }
+
+    async findProductIndexByName(productName: string): Promise<number> {
+        return this.productOperations.findProductIndexByName(productName);
+    }
+
+    async isProductInList(productName: string): Promise<boolean> {
+        return this.productOperations.isProductInList(productName);
+    }
+
+    async verifyAllProductsMatchSearchTerm(searchTerm: string): Promise<void> {
+        return this.productOperations.verifyAllProductsMatchSearchTerm(searchTerm);
+    }
+
+    // Category Operations - Delegated
+    async clickShortageTab(): Promise<void> {
+        return this.categoryOperations.clickShortageTab();
+    }
+
+    async clickPlentyInStockTab(): Promise<void> {
+        return this.categoryOperations.clickPlentyInStockTab();
+    }
+
+    async clickCategoryTab(category: string): Promise<void> {
+        return this.categoryOperations.clickCategoryTab(category, () => this.waitForPageLoaded());
+    }
+
+    async getTotalProductsCount(): Promise<number> {
+        return this.categoryOperations.getTotalProductsCount();
+    }
+
+    async getCategoryCount(category: string): Promise<number> {
+        return this.categoryOperations.getCategoryCount(category);
+    }
+
+    // Action Operations - Delegated
+    async selectFirstProductCheckbox(): Promise<void> {
+        return this.actionOperations.selectFirstProductCheckbox();
+    }
+
+    async selectProductCheckboxByIndex(productIndex: number): Promise<void> {
+        return this.actionOperations.selectProductCheckboxByIndex(productIndex);
     }
 
     async selectProductCheckboxByName(productName: string): Promise<void> {
-        return await this.actionOperations.selectProductCheckboxByName(
+        return this.actionOperations.selectProductCheckboxByName(
             productName,
             (name) => this.findProductIndexByName(name),
             (index, name) => {
@@ -211,28 +232,12 @@ class WorklistPage extends BasePage {
         );
     }
 
-    async getTotalProductsCount(): Promise<number> {
-        return await this.categoryOperations.getTotalProductsCount();
-    }
-
-    async getCategoryCount(category: string): Promise<number> {
-        return await this.categoryOperations.getCategoryCount(category);
-    }
-
-    async clickCategoryTab(category: string): Promise<void> {
-        return await this.categoryOperations.clickCategoryTab(category, () => this.waitForPageLoaded());
+    async clickOrderButton(): Promise<void> {
+        return this.actionOperations.clickOrderButton();
     }
 
     async clickRemoveButtonByIndex(index: number): Promise<void> {
-        return await this.actionOperations.clickRemoveButtonByIndex(index);
-    }
-
-    async isProductInList(productName: string): Promise<boolean> {
-        return await this.productOperations.isProductInList(productName);
-    }
-
-    async verifyAllProductsMatchSearchTerm(searchTerm: string): Promise<void> {
-        return await this.productOperations.verifyAllProductsMatchSearchTerm(searchTerm);
+        return this.actionOperations.clickRemoveButtonByIndex(index);
     }
 }
 

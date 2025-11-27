@@ -3,7 +3,6 @@ import { BasePage } from './BasePage.js';
 import type { Product } from '../interfaces/productInterface.js';
 
 class ProductDetailsPage extends BasePage {
-
     private static readonly PAGE_TITLE_SELECTOR: QmateSelector = {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Object",

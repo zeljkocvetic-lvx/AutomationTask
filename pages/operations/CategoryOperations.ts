@@ -59,5 +59,3 @@ export class CategoryOperations {
         return parseInt(countText, 10);
     }
 }
-
-

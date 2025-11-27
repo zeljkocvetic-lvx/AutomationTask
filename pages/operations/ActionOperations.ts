@@ -58,5 +58,3 @@ export class ActionOperations {
         await ui5.userInteraction.click(this.removeButtonSelector);
     }
 }
-
-

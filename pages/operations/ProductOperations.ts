@@ -66,12 +66,8 @@ export class ProductOperations {
 
     async getAllProducts(): Promise<Product[]> {
         const products = await ui5.element.getAllDisplayed(this.productNameSelector);
-        const productList: Product[] = [];
-        for (let i = 0; i < products.length; i++) {
-            const product = await this.getProductDetails(i);
-            productList.push(product);
-        }
-        return productList;
+        const productPromises = Array.from({ length: products.length }, (_, i) => this.getProductDetails(i));
+        return Promise.all(productPromises);
     }
 
     async findProductDetailsByName(productName: string): Promise<Product> {
@@ -119,5 +115,3 @@ export class ProductOperations {
         }
     }
 }
-
-
