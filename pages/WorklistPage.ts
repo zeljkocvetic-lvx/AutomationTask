@@ -1,6 +1,9 @@
 import type { Product } from '../interfaces/productInterface.js';
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 import { BasePage } from './BasePage.js';
+import { ProductOperations } from './operations/ProductOperations.js';
+import { CategoryOperations } from './operations/CategoryOperations.js';
+import { ActionOperations } from './operations/ActionOperations.js';
 
 class WorklistPage extends BasePage {
 
@@ -91,53 +94,69 @@ class WorklistPage extends BasePage {
         }
     };
 
+    private readonly productOperations: ProductOperations;
+    private readonly categoryOperations: CategoryOperations;
+    private readonly actionOperations: ActionOperations;
 
-
+    constructor() {
+        super();
+        this.productOperations = new ProductOperations(
+            WorklistPage.PRODUCT_NAME_SELECTOR,
+            WorklistPage.PRODUCT_SUPPLIER_SELECTOR,
+            WorklistPage.PRODUCT_PRICE_SELECTOR,
+            WorklistPage.PRODUCT_UNITS_SELECTOR,
+            WorklistPage.SEARCH_FIELD_SELECTOR
+        );
+        this.categoryOperations = new CategoryOperations(
+            WorklistPage.SHORTAGE_TAB_SELECTOR,
+            WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR,
+            WorklistPage.TOTAL_PRODUCTS_TAB_SELECTOR
+        );
+        this.actionOperations = new ActionOperations(
+            WorklistPage.PRODUCT_CHECKBOX_SELECTOR,
+            WorklistPage.ORDER_BUTTON_SELECTOR,
+            WorklistPage.REMOVE_BUTTON_SELECTOR
+        );
+    }
 
     async open(url: string): Promise<void> {
         await common.navigation.navigateToUrl(url);
     }
 
     async getProductName(index: number = 0): Promise<string> {
-        return await ui5.element.getPropertyValue(WorklistPage.PRODUCT_NAME_SELECTOR, "title", index);
+        return await this.productOperations.getProductName(index);
     }
 
     async getProductSupplier(index: number = 0): Promise<string> {
-        return await ui5.element.getPropertyValue(WorklistPage.PRODUCT_SUPPLIER_SELECTOR, "text", index);
+        return await this.productOperations.getProductSupplier(index);
     }
 
     async getProductPrice(index: number = 0): Promise<string> {
-        return await ui5.element.getPropertyValue(WorklistPage.PRODUCT_PRICE_SELECTOR, "number", index);
+        return await this.productOperations.getProductPrice(index);
     }
 
     async getProductUnitsInStock(index: number = 0): Promise<string> {
-        return await ui5.element.getPropertyValue(WorklistPage.PRODUCT_UNITS_SELECTOR, "number", index);
+        return await this.productOperations.getProductUnitsInStock(index);
     }
 
     async getProductDetails(index: number = 0): Promise<Product> {
-        const name = await this.getProductName(index);
-        const supplier = await this.getProductSupplier(index);
-        const price = await this.getProductPrice(index);
-        const unitsInStock = await this.getProductUnitsInStock(index);
-
-        return { name, supplier, price, unitsInStock };
+        return await this.productOperations.getProductDetails(index);
     }
 
     async clickFirstProduct(): Promise<void> {
-        await ui5.userInteraction.click(WorklistPage.PRODUCT_NAME_SELECTOR, 0);
+        return await this.productOperations.clickFirstProduct();
     }
 
     async clickProductByIndex(index: number): Promise<void> {
-        await ui5.userInteraction.click(WorklistPage.PRODUCT_NAME_SELECTOR, index);
+        return await this.productOperations.clickProductByIndex(index);
     }
 
     async searchProduct(productName: string): Promise<void> {
-        await ui5.userInteraction.searchFor(WorklistPage.SEARCH_FIELD_SELECTOR, productName);
+        return await this.productOperations.searchProduct(productName);
     }
 
     async getVisibleProductCount(): Promise<number> {
-        const products = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_NAME_SELECTOR);
-        return products.length;
+        return await this.productOperations.getVisibleProductCount();
     }
 
     async waitForPageLoaded(): Promise<void> {
@@ -145,139 +164,75 @@ class WorklistPage extends BasePage {
     }
 
     async clickShortageTab(): Promise<void> {
-        await ui5.userInteraction.click(WorklistPage.SHORTAGE_TAB_SELECTOR);
+        return await this.categoryOperations.clickShortageTab();
     }
 
     async clickPlentyInStockTab(): Promise<void> {
-        await ui5.userInteraction.click(WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR);
+        return await this.categoryOperations.clickPlentyInStockTab();
     }
 
     async selectFirstProductCheckbox(): Promise<void> {
-        const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
-        this.validateCheckboxesExist(allCheckboxes);
-        const firstProductCheckboxIndex = this.calculateCheckboxIndex(0, allCheckboxes.length);
-        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, firstProductCheckboxIndex);
+        return await this.actionOperations.selectFirstProductCheckbox();
     }
 
     async selectProductCheckboxByIndex(productIndex: number): Promise<void> {
-        const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
-        this.validateCheckboxesExist(allCheckboxes);
-        const checkboxIndex = this.calculateCheckboxIndex(productIndex, allCheckboxes.length);
-        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, checkboxIndex);
+        return await this.actionOperations.selectProductCheckboxByIndex(productIndex);
     }
 
     async clickOrderButton(): Promise<void> {
-        await ui5.userInteraction.click(WorklistPage.ORDER_BUTTON_SELECTOR);
+        return await this.actionOperations.clickOrderButton();
     }
 
     async getAllProducts(): Promise<Product[]> {
-        const products = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_NAME_SELECTOR);
-        const productList: Product[] = [];
-        for (let i = 0; i < products.length; i++) {
-            const product = await this.getProductDetails(i);
-            productList.push(product);
-        }
-        return productList;
+        return await this.productOperations.getAllProducts();
     }
 
     async findProductDetailsByName(productName: string): Promise<Product> {
-        const products = await this.getAllProducts();
-        const product = products.find(product => product.name === productName);
-        if (!product) {
-            throw new Error(`Product "${productName}" not found in the list`);
-        }
-        return product;
+        return await this.productOperations.findProductDetailsByName(productName);
     }
 
     async findProductIndexByName(productName: string): Promise<number> {
-        const products = await this.getAllProducts();
-        const index = products.findIndex(product => product.name === productName);
-        return index;
+        return await this.productOperations.findProductIndexByName(productName);
     }
 
     async clickProductByName(productName: string): Promise<void> {
-        const index = await this.findProductIndexByName(productName);
-        this.validateProductIndex(index, productName);
-        await this.clickProductByIndex(index);
+        return await this.productOperations.clickProductByName(productName);
     }
 
     async selectProductCheckboxByName(productName: string): Promise<void> {
-        const index = await this.findProductIndexByName(productName);
-        this.validateProductIndex(index, productName);
-        await this.selectProductCheckboxByIndex(index);
-    }
-
-    private validateCheckboxesExist(checkboxes: unknown[]): void {
-        if (checkboxes.length === 0) {
-            throw new Error('No checkboxes found in the list');
-        }
-    }
-
-    private calculateCheckboxIndex(productIndex: number, totalCheckboxes: number): number {
-        return totalCheckboxes > 1 ? productIndex + 1 : productIndex;
-    }
-
-    private validateProductIndex(index: number, productName: string): void {
-        if (index === -1) {
-            throw new Error(`Product "${productName}" not found in the list`);
-        }
+        return await this.actionOperations.selectProductCheckboxByName(
+            productName,
+            (name) => this.findProductIndexByName(name),
+            (index, name) => {
+                if (index === -1) {
+                    throw new Error(`Product "${name}" not found in the list`);
+                }
+            }
+        );
     }
 
     async getTotalProductsCount(): Promise<number> {
-        const countText = await ui5.element.getPropertyValue(WorklistPage.TOTAL_PRODUCTS_TAB_SELECTOR, "count");
-        return parseInt(countText, 10);
+        return await this.categoryOperations.getTotalProductsCount();
     }
 
     async getCategoryCount(category: string): Promise<number> {
-        let selector: QmateSelector;
-        switch (category) {
-            case 'Shortage':
-                selector = WorklistPage.SHORTAGE_TAB_SELECTOR;
-                break;
-            case 'Plenty in Stock':
-                selector = WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR;
-                break;
-            default:
-                throw new Error(`Unknown category: ${category}`);
-        }
-        const countText = await ui5.element.getPropertyValue(selector, "count");
-        return parseInt(countText, 10);
+        return await this.categoryOperations.getCategoryCount(category);
     }
 
     async clickCategoryTab(category: string): Promise<void> {
-        switch (category) {
-            case 'Shortage':
-                await this.clickShortageTab();
-                break;
-            case 'Plenty in Stock':
-                await this.clickPlentyInStockTab();
-                break;
-            default:
-                throw new Error(`Unknown category: ${category}`);
-        }
-        await this.waitForPageLoaded();
+        return await this.categoryOperations.clickCategoryTab(category, () => this.waitForPageLoaded());
     }
 
     async clickRemoveButtonByIndex(index: number): Promise<void> {
-        await ui5.userInteraction.click(WorklistPage.REMOVE_BUTTON_SELECTOR, index);
+        return await this.actionOperations.clickRemoveButtonByIndex(index);
     }
 
     async isProductInList(productName: string): Promise<boolean> {
-        try {
-            await this.findProductDetailsByName(productName);
-            return true;
-        } catch {
-            return false;
-        }
+        return await this.productOperations.isProductInList(productName);
     }
 
     async verifyAllProductsMatchSearchTerm(searchTerm: string): Promise<void> {
-        const products = await this.getAllProducts();
-        for (const product of products) {
-            if (!product.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-                throw new Error(`Product "${product.name}" does not match search term "${searchTerm}"`);
-            }
-        }
+        return await this.productOperations.verifyAllProductsMatchSearchTerm(searchTerm);
     }
 }
 

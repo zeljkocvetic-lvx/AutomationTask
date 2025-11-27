@@ -42,8 +42,8 @@ export class CategoryOperations {
         await ui5.userInteraction.click(this.plentyInStockTabSelector);
     }
 
-    async clickCategoryTab(category: ProductCategory, waitForPageLoaded: () => Promise<void>): Promise<void> {
-        const config = this.getCategoryConfig(category);
+    async clickCategoryTab(category: string, waitForPageLoaded: () => Promise<void>): Promise<void> {
+        const config = this.getCategoryConfig(category as ProductCategory);
         await config.clickMethod();
         await waitForPageLoaded();
     }
@@ -53,8 +53,8 @@ export class CategoryOperations {
         return parseInt(countText, 10);
     }
 
-    async getCategoryCount(category: ProductCategory): Promise<number> {
-        const config = this.getCategoryConfig(category);
+    async getCategoryCount(category: string): Promise<number> {
+        const config = this.getCategoryConfig(category as ProductCategory);
         const countText = await ui5.element.getPropertyValue(config.selector, "count");
         return parseInt(countText, 10);
     }
