@@ -13,25 +13,24 @@ Given('Open the app {string}', async function (url: string) {
 
 // Scenario 1 - Product Info Consistency
 When('Select product at index {int} from the worklist', async function (productIndex: number) {
-    const worklistProductInfo = await WorklistPage.getProductDetails(productIndex);
-    this.addProductToStorage(worklistProductInfo);
+    const worklistProduct = await WorklistPage.getProductDetails(productIndex);
+    this.addProductToStorage(worklistProduct);
 
     await WorklistPage.clickProductByIndex(productIndex);
     await ProductDetailsPage.waitForPageLoaded();
 
-    const detailsProductInfo = await ProductDetailsPage.getProductInfo();
-    this.addProductToStorage(detailsProductInfo);
-    await attachScreenshot(`Product Details Page Loaded: ${worklistProductInfo.name}`);
+    const detailsProduct = await ProductDetailsPage.getProductInfo();
+    this.addProductToStorage(detailsProduct);
+
+    await attachScreenshot(`Product Details Page Loaded: ${worklistProduct.name}`);
 });
 
 Then('Verify product details page displays matching information for all fields', async function () {
     const products = this.getProducts();
-
     const formatProduct = (product: Product) => `${product.name}::${product.supplier}::${product.price}::${product.unitsInStock}`;
-    const formattedProducts = products.map(formatProduct);
 
-    const worklistProduct = formattedProducts[0];
-    const detailsProduct = formattedProducts[1];
+    const worklistProduct = products.map(formatProduct)[0];
+    const detailsProduct = products.map(formatProduct)[1];
 
     await common.assertion.expectEqual(detailsProduct, worklistProduct);
     await attachScreenshot('Product Info Verified');
@@ -95,7 +94,6 @@ Given('Navigate to {string} category tab', async function (category: string) {
     await attachScreenshot(`Navigated to ${category} tab`);
 });
 
-
 When('Delete the product at index {int}', async function (productIndex: number) {
     await WorklistPage.selectProductCheckboxByIndex(productIndex);
     await WorklistPage.clickRemoveButtonByIndex(0);
@@ -105,7 +103,6 @@ When('Delete the product at index {int}', async function (productIndex: number) 
 
 Then('Verify the total number of products decreased by 1', async function () {
     const originalCounts = this.getProductCounts();
-
     const currentTotalCount = await WorklistPage.getTotalProductsCount();
     const expectedTotalCount = originalCounts.total - 1;
 
@@ -115,7 +112,6 @@ Then('Verify the total number of products decreased by 1', async function () {
 
 Then('Verify the {string} category count decreased by 1', async function (category: string) {
     const originalCounts = this.getProductCounts();
-
     const currentCategoryCount = await WorklistPage.getCategoryCount(category);
     const expectedCategoryCount = originalCounts.category - 1;
 
@@ -151,14 +147,17 @@ Given('Note the product name at index {int}', async function (productIndex: numb
 When('Search for the stored product name', async function () {
     const products = this.getProducts();
     const productToSearch = products[products.length - 1];
+
     await WorklistPage.searchProduct(productToSearch.name);
     await WorklistPage.waitForPageLoaded();
+
     await attachScreenshot(`Searched for "${productToSearch.name}"`);
 });
 
 Then('Verify only products matching the search query are displayed', async function () {
     const products = this.getProducts();
     const searchTerm = products[products.length - 1].name;
+
     await WorklistPage.verifyAllProductsMatchSearchTerm(searchTerm);
     await attachScreenshot(`Verified all products match search term: "${searchTerm}"`);
 });
