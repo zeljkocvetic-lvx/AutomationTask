@@ -35,12 +35,12 @@ Feature: Product Management in SAP UI5 Worklist Application
 
     @scenario3
     Scenario Outline: Product Deletion
-        Given Note the total products count and <category> category count
-        And Select product at index <product_index> from <category> category
+        Given Note the total products count and "<category>" category count
+        And Navigate to "<category>" category tab
         And Note the product details at index <product_index>
         When Delete the product at index <product_index>
         Then Verify the total number of products decreased by 1
-        And Verify the <category> category count decreased by 1
+        And Verify the "<category>" category count decreased by 1
         And Verify the product is not displayed in any listing
 
         Examples:

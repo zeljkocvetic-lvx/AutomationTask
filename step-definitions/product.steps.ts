@@ -4,7 +4,6 @@ import WorklistPage from '../pages/WorklistPage.js';
 import ProductDetailsPage from '../pages/ProductDetailsPage.js';
 import type { Product } from '../interfaces/productInterface.js';
 import type { ProductCounts } from '../interfaces/productCounts.js';
-import type { ProductCategory } from '../interfaces/productCategory.js';
 
 // Background
 Given('Open the app {string}', async function (url: string) {
@@ -84,22 +83,18 @@ Then('Verify the product appears in the list with increased units', async functi
 // Scenario 3 - Product Deletion
 Given('Note the total products count and {string} category count', async function (category: string) {
     const totalCount = await WorklistPage.getTotalProductsCount();
-    const categoryCount = await WorklistPage.getCategoryCount(category as ProductCategory);
+    const categoryCount = await WorklistPage.getCategoryCount(category);
     const counts: ProductCounts = { total: totalCount, category: categoryCount };
     this.setProductCounts(counts);
     await attachScreenshot(`Initial Counts Noted: Total=${totalCount}, ${category}=${categoryCount}`);
 });
 
-Given('Select product at index {int} from {string} category', async function (_productIndex: number, category: string) {
-    await WorklistPage.clickCategoryTab(category as ProductCategory);
-    await attachScreenshot(`Selected ${category} tab`);
+Given('Navigate to {string} category tab', async function (category: string) {
+    await WorklistPage.clickCategoryTab(category);
+    await WorklistPage.waitForPageLoaded();
+    await attachScreenshot(`Navigated to ${category} tab`);
 });
 
-Given('Note the product details at index {int}', async function (productIndex: number) {
-    const productInfo = await WorklistPage.getProductDetails(productIndex);
-    this.addProductToStorage(productInfo);
-    await attachScreenshot(`Product Noted: ${productInfo.name} with ${productInfo.unitsInStock} units`);
-});
 
 When('Delete the product at index {int}', async function (productIndex: number) {
     await WorklistPage.selectProductCheckboxByIndex(productIndex);
@@ -110,9 +105,6 @@ When('Delete the product at index {int}', async function (productIndex: number) 
 
 Then('Verify the total number of products decreased by 1', async function () {
     const originalCounts = this.getProductCounts();
-    if (!originalCounts) {
-        throw new Error('Product counts were not stored');
-    }
 
     const currentTotalCount = await WorklistPage.getTotalProductsCount();
     const expectedTotalCount = originalCounts.total - 1;
@@ -123,11 +115,8 @@ Then('Verify the total number of products decreased by 1', async function () {
 
 Then('Verify the {string} category count decreased by 1', async function (category: string) {
     const originalCounts = this.getProductCounts();
-    if (!originalCounts) {
-        throw new Error('Product counts were not stored');
-    }
 
-    const currentCategoryCount = await WorklistPage.getCategoryCount(category as ProductCategory);
+    const currentCategoryCount = await WorklistPage.getCategoryCount(category);
     const expectedCategoryCount = originalCounts.category - 1;
 
     await common.assertion.expectEqual(currentCategoryCount, expectedCategoryCount);

@@ -55,11 +55,11 @@ export const config: WebdriverIO.Config = {
     },
 
     beforeScenario: async function (world: any) {
-        const allure = require('@wdio/allure-reporter').default;
+        const { default: allure, addArgument } = await import('@wdio/allure-reporter');
         allure.addFeature(world.pickle.name);
         if (world.pickle.parameters) {
             world.pickle.parameters.forEach((param: any) => {
-                allure.addParameter(param.name, param.value);
+                addArgument(param.name, param.value);
             });
         }
     },
