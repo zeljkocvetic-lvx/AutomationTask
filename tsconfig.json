@@ -1,0 +1,43 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "target": "es2022",
+        "lib": [
+            "es2022",
+            "dom"
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "wdio-qmate-service/*": [
+                "./node_modules/@types/wdio-qmate-service/*"
+            ]
+        },
+        "types": [
+            "node",
+            "@wdio/globals/types",
+            "expect-webdriverio",
+            "@wdio/cucumber-framework",
+            "@types/wdio-qmate-service"
+        ],
+        "skipLibCheck": true,
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true
+    },
+    "include": [
+        "wdio.conf.ts",
+        "./features",
+        "./helpers",
+        "./pages",
+        "./step-definitions",
+        "./support",
+        "./node_modules/@sap_oss/wdio-qmate-service/**/*.d.ts",
+        "interfaces"
+    ]
+}
