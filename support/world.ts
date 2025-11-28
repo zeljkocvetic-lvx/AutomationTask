@@ -5,10 +5,12 @@ import type { ProductCounts } from '../interfaces/productCounts.js';
 export class CustomWorld {
     private addedProducts: Product[];
     private productCounts: ProductCounts | null;
+    private selectedProduct: Product | null;
 
     constructor() {
         this.addedProducts = [];
         this.productCounts = null;
+        this.selectedProduct = null;
     }
 
     addProductToStorage(product: Product): void {
@@ -23,8 +25,22 @@ export class CustomWorld {
         this.productCounts = { ...counts };
     }
 
-    getProductCounts(): ProductCounts | null {
-        return this.productCounts ? { ...this.productCounts } : null;
+    getProductCounts(): ProductCounts {
+        if (!this.productCounts) {
+            throw new Error('Product counts not stored. Please note the counts first.');
+        }
+        return this.productCounts;
+    }
+
+    setSelectedProduct(product: Product): void {
+        this.selectedProduct = product;
+    }
+
+    getSelectedProduct(): Product {
+        if (!this.selectedProduct) {
+            throw new Error('No product selected. Please select a product first.');
+        }
+        return this.selectedProduct;
     }
 }
 

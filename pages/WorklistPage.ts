@@ -88,6 +88,10 @@ class WorklistPage extends BasePage {
     }
 
     async clickCategoryTab(category: string): Promise<void> {
+        if (category === 'All Products') {
+            await this.waitForPageLoaded();
+            return;
+        }
         const config = this.getCategoryConfig(category as ProductCategory);
         await config.clickMethod();
         await this.waitForPageLoaded();
@@ -99,6 +103,9 @@ class WorklistPage extends BasePage {
     }
 
     async getCategoryCount(category: string): Promise<number> {
+        if (category === 'All Products') {
+            return await this.getTotalProductsCount();
+        }
         const config = this.getCategoryConfig(category as ProductCategory);
         const countText = await ui5.element.getPropertyValue(config.selector, "count");
         return parseInt(countText, 10);
@@ -123,18 +130,19 @@ class WorklistPage extends BasePage {
     }
 
     // Action methods
-    async selectFirstProductCheckbox(): Promise<void> {
-        const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
-        this.validateCheckboxesExist(allCheckboxes);
-        const firstProductCheckboxIndex = this.calculateCheckboxIndex(0, allCheckboxes.length);
-        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, firstProductCheckboxIndex);
-    }
-
     async selectProductCheckboxByIndex(productIndex: number): Promise<void> {
         const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
         this.validateCheckboxesExist(allCheckboxes);
         const checkboxIndex = this.calculateCheckboxIndex(productIndex, allCheckboxes.length);
         await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, checkboxIndex);
+    }
+
+    async selectProductCheckboxByName(productName: string, findProductIndexByName: (name: string) => Promise<number>): Promise<void> {
+        const productIndex = await findProductIndexByName(productName);
+        if (productIndex === -1) {
+            throw new Error(`Product "${productName}" not found in the list`);
+        }
+        await this.selectProductCheckboxByIndex(productIndex);
     }
 
     async clickOrderButton(): Promise<void> {

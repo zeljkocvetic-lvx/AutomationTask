@@ -2,7 +2,7 @@ import type { Product } from '../interfaces/productInterface.js';
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 
 class ProductTablePage {
-    // Product table selectors - these identify elements within the product table
+    // Product table selectors 
     private static readonly PRODUCT_NAME_SELECTOR: QmateSelector = {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
@@ -76,6 +76,15 @@ class ProductTablePage {
         const products = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
         const productPromises = Array.from({ length: products.length }, (_, i) => this.getProductDetails(i));
         return Promise.all(productPromises);
+    }
+
+    async getRandomProduct(): Promise<Product> {
+        const products = await this.getAllProducts();
+        if (products.length === 0) {
+            throw new Error('No products found in the current view');
+        }
+        const randomIndex = Math.floor(Math.random() * products.length);
+        return products[randomIndex];
     }
 
     async findProductDetailsByName(productName: string): Promise<Product> {

@@ -1,13 +1,11 @@
 # Node dependencies
 node_modules/
+package-lock.json
 
 # Allure test results and reports
 allure-results/
 allure-report/
-node_modules/
 *.allure
-package-lock.json
-package.json
 
 # Logs
 logs/

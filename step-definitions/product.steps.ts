@@ -7,77 +7,75 @@ import type { Product } from '../interfaces/productInterface.js';
 import type { ProductCounts } from '../interfaces/productCounts.js';
 
 // Background
-Given('Open the app {string}', async function (url: string) {
+Given('Open the app', async function () {
+    const url = 'https://sdk.openui5.org/test-resources/sap/m/demokit/tutorial/worklist/07/webapp/test/mockServer.html?sap-ui-theme=sap_horizon';
     await WorklistPage.open(url);
     await WorklistPage.waitForPageLoaded();
 });
 
 // Scenario 1 - Product Info Consistency
-When('Select product at index {int} from the worklist', async function (productIndex: number) {
-    const worklistProduct = await ProductTablePage.getProductDetails(productIndex);
+Given('Select random product from {string} category', async function (category: string) {
+    await WorklistPage.clickCategoryTab(category);
+    const selectedProduct = await ProductTablePage.getRandomProduct();
+    this.setSelectedProduct(selectedProduct);
+    this.addProductToStorage(selectedProduct);
+    await attachScreenshot(`Selected random product "${selectedProduct.name}" from ${category} category`);
+});
+
+Given('Select random product from {string} tab', async function (tab: string) {
+    await WorklistPage.clickCategoryTab(tab);
+    const selectedProduct = await ProductTablePage.getRandomProduct();
+    this.setSelectedProduct(selectedProduct);
+    this.addProductToStorage(selectedProduct);
+    await attachScreenshot(`Selected random product "${selectedProduct.name}" from ${tab} tab`);
+});
+
+When('Open product details page for the selected product', async function () {
+    const selectedProduct = this.getSelectedProduct();
+    const worklistProduct = await ProductTablePage.findProductDetailsByName(selectedProduct.name);
     this.addProductToStorage(worklistProduct);
-
-    await ProductTablePage.clickProductByIndex(productIndex);
+    await ProductTablePage.clickProductByName(selectedProduct.name);
     await ProductDetailsPage.waitForPageLoaded();
-
     const detailsProduct = await ProductDetailsPage.getProductInfo();
     this.addProductToStorage(detailsProduct);
-
-    await attachScreenshot(`Product Details Page Loaded: ${worklistProduct.name}`);
+    await attachScreenshot(`Product Details Page Loaded: ${selectedProduct.name}`);
 });
 
 Then('Verify product details page displays matching information for all fields', async function () {
     const products = this.getProducts();
     const formatProduct = (product: Product) => `${product.name}::${product.supplier}::${product.price}::${product.unitsInStock}`;
-
     const worklistProduct = products.map(formatProduct)[0];
     const detailsProduct = products.map(formatProduct)[1];
-
     await common.assertion.expectEqual(detailsProduct, worklistProduct);
     await attachScreenshot('Product Info Verified');
 });
 
 // Scenario 2 - Product Order Flow
-Given('Click on the Shortage tab', async function () {
-    await WorklistPage.clickShortageTab();
-    await WorklistPage.waitForPageLoaded();
-    await attachScreenshot('Shortage Tab Clicked');
+Given('Open the {string} category tab', async function (category: string) {
+    await WorklistPage.clickCategoryTab(category);
+    await attachScreenshot(`Opened ${category} category tab`);
 });
 
-Given('Select product checkbox at index {int}', async function (productIndex: number) {
-    await WorklistPage.selectProductCheckboxByIndex(productIndex);
-    await attachScreenshot(`Product Checkbox Selected at index ${productIndex}`);
-});
-
-Given('Note the product details at index {int}', async function (productIndex: number) {
-    const productInfo = await ProductTablePage.getProductDetails(productIndex);
-    this.addProductToStorage(productInfo);
-    await attachScreenshot(`Product Noted: ${productInfo.name} with ${productInfo.unitsInStock} units`);
-});
-
-When('Click the Order button', async function () {
+When('Order the selected product', async function () {
+    const selectedProduct = this.getSelectedProduct();
+    await WorklistPage.selectProductCheckboxByName(selectedProduct.name, (name) => ProductTablePage.findProductIndexByName(name));
     await WorklistPage.clickOrderButton();
     await WorklistPage.waitForPageLoaded();
-    await attachScreenshot('Order Button Clicked');
+    await attachScreenshot(`Ordered product "${selectedProduct.name}"`);
 });
 
-Then('Click on the Plenty in Stock tab', async function () {
-    await WorklistPage.clickPlentyInStockTab();
-    await WorklistPage.waitForPageLoaded();
-    await attachScreenshot('Plenty in Stock Tab Clicked');
+Then('Open the {string} category tab', async function (category: string) {
+    await WorklistPage.clickCategoryTab(category);
+    await attachScreenshot(`Opened ${category} category tab`);
 });
 
 Then('Verify the product appears in the list with increased units', async function () {
-    const products = this.getProducts();
-    const originalProduct = products[0];
-
+    const originalProduct = this.getSelectedProduct();
     const currentProduct = await ProductTablePage.findProductDetailsByName(originalProduct.name);
-
     const originalUnits = parseFloat(originalProduct.unitsInStock);
     const currentUnits = parseFloat(currentProduct.unitsInStock);
-
     await common.assertion.expectTrue(currentUnits > originalUnits);
-    await attachScreenshot(`Units increased from ${originalUnits} to ${currentUnits}`);
+    await attachScreenshot(`Product "${originalProduct.name}" units increased from ${originalUnits} to ${currentUnits}`);
 });
 
 // Scenario 3 - Product Deletion
@@ -89,41 +87,32 @@ Given('Note the total products count and {string} category count', async functio
     await attachScreenshot(`Initial Counts Noted: Total=${totalCount}, ${category}=${categoryCount}`);
 });
 
-Given('Navigate to {string} category tab', async function (category: string) {
-    await WorklistPage.clickCategoryTab(category);
-    await WorklistPage.waitForPageLoaded();
-    await attachScreenshot(`Navigated to ${category} tab`);
-});
-
-When('Delete the product at index {int}', async function (productIndex: number) {
-    await WorklistPage.selectProductCheckboxByIndex(productIndex);
+When('Delete the selected product', async function () {
+    const selectedProduct = this.getSelectedProduct();
+    await WorklistPage.selectProductCheckboxByName(selectedProduct.name, (name) => ProductTablePage.findProductIndexByName(name));
     await WorklistPage.clickRemoveButtonByIndex(0);
     await WorklistPage.waitForPageLoaded();
-    await attachScreenshot(`Product at index ${productIndex} deleted`);
+    await attachScreenshot(`Deleted product "${selectedProduct.name}"`);
 });
 
-Then('Verify the total number of products decreased by 1', async function () {
+Then('Verify the total number of products decreased by {int}', async function (decreaseAmount: number) {
     const originalCounts = this.getProductCounts();
     const currentTotalCount = await WorklistPage.getTotalProductsCount();
-    const expectedTotalCount = originalCounts.total - 1;
-
+    const expectedTotalCount = originalCounts.total - decreaseAmount;
     await common.assertion.expectEqual(currentTotalCount, expectedTotalCount);
-    await attachScreenshot(`Total products decreased from ${originalCounts.total} to ${currentTotalCount}`);
+    await attachScreenshot(`Total products decreased from ${originalCounts.total} to ${currentTotalCount} (decreased by ${decreaseAmount})`);
 });
 
-Then('Verify the {string} category count decreased by 1', async function (category: string) {
+Then('Verify the {string} category count decreased by {int}', async function (category: string, decreaseAmount: number) {
     const originalCounts = this.getProductCounts();
     const currentCategoryCount = await WorklistPage.getCategoryCount(category);
-    const expectedCategoryCount = originalCounts.category - 1;
-
+    const expectedCategoryCount = originalCounts.category - decreaseAmount;
     await common.assertion.expectEqual(currentCategoryCount, expectedCategoryCount);
-    await attachScreenshot(`${category} count decreased from ${originalCounts.category} to ${currentCategoryCount}`);
+    await attachScreenshot(`${category} count decreased from ${originalCounts.category} to ${currentCategoryCount} (decreased by ${decreaseAmount})`);
 });
 
 Then('Verify the product is not displayed in any listing', async function () {
-    const products = this.getProducts();
-    const deletedProduct = products[products.length - 1];
-
+    const deletedProduct = this.getSelectedProduct();
     const isInAllTab = await ProductTablePage.isProductInList(deletedProduct.name);
     await WorklistPage.clickShortageTab();
     await WorklistPage.waitForPageLoaded();
@@ -131,7 +120,6 @@ Then('Verify the product is not displayed in any listing', async function () {
     await WorklistPage.clickPlentyInStockTab();
     await WorklistPage.waitForPageLoaded();
     const isInPlentyTab = await ProductTablePage.isProductInList(deletedProduct.name);
-
     await common.assertion.expectFalse(isInAllTab);
     await common.assertion.expectFalse(isInShortageTab);
     await common.assertion.expectFalse(isInPlentyTab);
@@ -139,26 +127,17 @@ Then('Verify the product is not displayed in any listing', async function () {
 });
 
 // Scenario 4 - Product Search
-Given('Note the product name at index {int}', async function (productIndex: number) {
-    const productInfo = await ProductTablePage.getProductDetails(productIndex);
-    this.addProductToStorage(productInfo);
-    await attachScreenshot(`Product name noted: ${productInfo.name}`);
-});
-
-When('Search for the stored product name', async function () {
-    const products = this.getProducts();
-    const productToSearch = products[products.length - 1];
-
-    await WorklistPage.searchProduct(productToSearch.name);
+When('Search for the selected product name', async function () {
+    const selectedProduct = this.getSelectedProduct();
+    const searchTerm = selectedProduct.name.split(' ')[0];
+    await WorklistPage.searchProduct(searchTerm);
     await WorklistPage.waitForPageLoaded();
-
-    await attachScreenshot(`Searched for "${productToSearch.name}"`);
+    await attachScreenshot(`Searched for "${searchTerm}"`);
 });
 
 Then('Verify only products matching the search query are displayed', async function () {
-    const products = this.getProducts();
-    const searchTerm = products[products.length - 1].name;
-
+    const selectedProduct = this.getSelectedProduct();
+    const searchTerm = selectedProduct.name.split(' ')[0];
     await ProductTablePage.verifyAllProductsMatchSearchTerm(searchTerm);
     await attachScreenshot(`Verified all products match search term: "${searchTerm}"`);
 });
