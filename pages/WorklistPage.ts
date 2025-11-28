@@ -88,10 +88,6 @@ class WorklistPage extends BasePage {
     }
 
     async clickCategoryTab(category: string): Promise<void> {
-        if (category === 'All Products') {
-            await this.waitForPageLoaded();
-            return;
-        }
         const config = this.getCategoryConfig(category as ProductCategory);
         await config.clickMethod();
         await this.waitForPageLoaded();
