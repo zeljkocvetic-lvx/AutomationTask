@@ -1,6 +1,6 @@
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 import { BasePage } from './BasePage.js';
-import type { ProductCategory } from '../interfaces/productCategory.js';
+import type { ProductCategory } from '../types/productCategory.js';
 
 class WorklistPage extends BasePage {
     // Category-related selectors
@@ -70,7 +70,8 @@ class WorklistPage extends BasePage {
     };
 
     // Core page methods
-    async open(url: string): Promise<void> {
+    async open(): Promise<void> {
+        const url = 'https://sdk.openui5.org/test-resources/sap/m/demokit/tutorial/worklist/07/webapp/test/mockServer.html?sap-ui-theme=sap_horizon';
         await common.navigation.navigateToUrl(url);
     }
 
@@ -88,10 +89,6 @@ class WorklistPage extends BasePage {
     }
 
     async clickCategoryTab(category: string): Promise<void> {
-        if (category === 'All Products') {
-            await this.waitForPageLoaded();
-            return;
-        }
         const config = this.getCategoryConfig(category as ProductCategory);
         await config.clickMethod();
         await this.waitForPageLoaded();
@@ -103,9 +100,6 @@ class WorklistPage extends BasePage {
     }
 
     async getCategoryCount(category: string): Promise<number> {
-        if (category === 'All Products') {
-            return await this.getTotalProductsCount();
-        }
         const config = this.getCategoryConfig(category as ProductCategory);
         const countText = await ui5.element.getPropertyValue(config.selector, "count");
         return parseInt(countText, 10);
@@ -120,6 +114,11 @@ class WorklistPage extends BasePage {
             'Plenty in Stock': {
                 selector: WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR,
                 clickMethod: () => this.clickPlentyInStockTab()
+            },
+            'All Products': {
+                selector: WorklistPage.TOTAL_PRODUCTS_TAB_SELECTOR,
+                clickMethod: async () => {
+                }
             }
         };
         const config = configs[category];
@@ -130,19 +129,16 @@ class WorklistPage extends BasePage {
     }
 
     // Action methods
-    async selectProductCheckboxByIndex(productIndex: number): Promise<void> {
-        const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
-        this.validateCheckboxesExist(allCheckboxes);
-        const checkboxIndex = this.calculateCheckboxIndex(productIndex, allCheckboxes.length);
-        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, checkboxIndex);
-    }
-
     async selectProductCheckboxByName(productName: string, findProductIndexByName: (name: string) => Promise<number>): Promise<void> {
         const productIndex = await findProductIndexByName(productName);
         if (productIndex === -1) {
             throw new Error(`Product "${productName}" not found in the list`);
         }
-        await this.selectProductCheckboxByIndex(productIndex);
+
+        const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
+        this.validateCheckboxesExist(allCheckboxes);
+        const checkboxIndex = this.calculateCheckboxIndex(productIndex, allCheckboxes.length);
+        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, checkboxIndex);
     }
 
     async clickOrderButton(): Promise<void> {

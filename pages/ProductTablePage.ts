@@ -59,10 +59,6 @@ class ProductTablePage {
         return { name, supplier, price, unitsInStock };
     }
 
-    async clickFirstProduct(): Promise<void> {
-        await ui5.userInteraction.click(ProductTablePage.PRODUCT_NAME_SELECTOR, 0);
-    }
-
     async clickProductByIndex(index: number): Promise<void> {
         await ui5.userInteraction.click(ProductTablePage.PRODUCT_NAME_SELECTOR, index);
     }

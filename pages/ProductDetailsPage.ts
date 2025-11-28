@@ -29,7 +29,8 @@ class ProductDetailsPage extends BasePage {
     private static readonly PRICE_SELECTOR: QmateSelector = {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Object",
-            metadata: "sap.m.Text"
+            metadata: "sap.m.ObjectAttribute",
+            title: "Price"
         }
     };
 
@@ -54,14 +55,8 @@ class ProductDetailsPage extends BasePage {
     }
 
     async getPrice(): Promise<string> {
-        const textElements = await ui5.element.getAllDisplayed(ProductDetailsPage.PRICE_SELECTOR);
-        for (const element of textElements) {
-            const text = await element.getText();
-            if (text.includes("Price:")) {
-                return text.replace(/[^\d.]/g, "");
-            }
-        }
-        throw new Error("Price text not found on product details page");
+        const priceText = await ui5.element.getPropertyValue(ProductDetailsPage.PRICE_SELECTOR, "text");
+        return priceText.replace(/[^\d.]/g, "");
     }
 
     async getUnitsInStock(): Promise<string> {
