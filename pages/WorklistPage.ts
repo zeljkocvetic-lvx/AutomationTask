@@ -1,51 +1,8 @@
-import type { Product } from '../interfaces/productInterface.js';
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 import { BasePage } from './BasePage.js';
-import { ProductOperations } from './operations/ProductOperations.js';
-import { CategoryOperations } from './operations/CategoryOperations.js';
-import { ActionOperations } from './operations/ActionOperations.js';
+import type { ProductCategory } from '../interfaces/productCategory.js';
 
 class WorklistPage extends BasePage {
-    // Product-related selectors
-    private static readonly PRODUCT_NAME_SELECTOR: QmateSelector = {
-        elementProperties: {
-            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-            metadata: "sap.m.ObjectIdentifier"
-        }
-    };
-
-    private static readonly PRODUCT_SUPPLIER_SELECTOR: QmateSelector = {
-        elementProperties: {
-            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-            metadata: "sap.m.Text",
-            text: [{ path: "Supplier/CompanyName" }]
-        }
-    };
-
-    private static readonly PRODUCT_PRICE_SELECTOR: QmateSelector = {
-        elementProperties: {
-            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-            metadata: "sap.m.ObjectNumber",
-            number: [{ path: "UnitPrice" }]
-        }
-    };
-
-    private static readonly PRODUCT_UNITS_SELECTOR: QmateSelector = {
-        elementProperties: {
-            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-            metadata: "sap.m.ObjectNumber",
-            number: [{ path: "UnitsInStock" }]
-        }
-    };
-
-    private static readonly SEARCH_FIELD_SELECTOR: QmateSelector = {
-        elementProperties: {
-            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-            metadata: "sap.m.SearchField",
-            id: "*searchField"
-        }
-    };
-
     // Category-related selectors
     private static readonly SHORTAGE_TAB_SELECTOR: QmateSelector = {
         elementProperties: {
@@ -95,30 +52,22 @@ class WorklistPage extends BasePage {
         }
     };
 
-    private readonly productOperations: ProductOperations;
-    private readonly categoryOperations: CategoryOperations;
-    private readonly actionOperations: ActionOperations;
+    // Search field selector
+    private static readonly SEARCH_FIELD_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.SearchField",
+            id: "*searchField"
+        }
+    };
 
-    constructor() {
-        super();
-        this.productOperations = new ProductOperations(
-            WorklistPage.PRODUCT_NAME_SELECTOR,
-            WorklistPage.PRODUCT_SUPPLIER_SELECTOR,
-            WorklistPage.PRODUCT_PRICE_SELECTOR,
-            WorklistPage.PRODUCT_UNITS_SELECTOR,
-            WorklistPage.SEARCH_FIELD_SELECTOR
-        );
-        this.categoryOperations = new CategoryOperations(
-            WorklistPage.SHORTAGE_TAB_SELECTOR,
-            WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR,
-            WorklistPage.TOTAL_PRODUCTS_TAB_SELECTOR
-        );
-        this.actionOperations = new ActionOperations(
-            WorklistPage.PRODUCT_CHECKBOX_SELECTOR,
-            WorklistPage.ORDER_BUTTON_SELECTOR,
-            WorklistPage.REMOVE_BUTTON_SELECTOR
-        );
-    }
+    // Product name selector - used only for waitForPageLoaded
+    private static readonly PRODUCT_NAME_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.ObjectIdentifier"
+        }
+    };
 
     // Core page methods
     async open(url: string): Promise<void> {
@@ -129,115 +78,87 @@ class WorklistPage extends BasePage {
         await ui5.element.getDisplayed(WorklistPage.PRODUCT_NAME_SELECTOR);
     }
 
-    // Product Operations - Delegated
-    async getProductName(index: number = 0): Promise<string> {
-        return this.productOperations.getProductName(index);
-    }
-
-    async getProductSupplier(index: number = 0): Promise<string> {
-        return this.productOperations.getProductSupplier(index);
-    }
-
-    async getProductPrice(index: number = 0): Promise<string> {
-        return this.productOperations.getProductPrice(index);
-    }
-
-    async getProductUnitsInStock(index: number = 0): Promise<string> {
-        return this.productOperations.getProductUnitsInStock(index);
-    }
-
-    async getProductDetails(index: number = 0): Promise<Product> {
-        return this.productOperations.getProductDetails(index);
-    }
-
-    async clickFirstProduct(): Promise<void> {
-        return this.productOperations.clickFirstProduct();
-    }
-
-    async clickProductByIndex(index: number): Promise<void> {
-        return this.productOperations.clickProductByIndex(index);
-    }
-
-    async clickProductByName(productName: string): Promise<void> {
-        return this.productOperations.clickProductByName(productName);
-    }
-
-    async searchProduct(productName: string): Promise<void> {
-        return this.productOperations.searchProduct(productName);
-    }
-
-    async getVisibleProductCount(): Promise<number> {
-        return this.productOperations.getVisibleProductCount();
-    }
-
-    async getAllProducts(): Promise<Product[]> {
-        return this.productOperations.getAllProducts();
-    }
-
-    async findProductDetailsByName(productName: string): Promise<Product> {
-        return this.productOperations.findProductDetailsByName(productName);
-    }
-
-    async findProductIndexByName(productName: string): Promise<number> {
-        return this.productOperations.findProductIndexByName(productName);
-    }
-
-    async isProductInList(productName: string): Promise<boolean> {
-        return this.productOperations.isProductInList(productName);
-    }
-
-    async verifyAllProductsMatchSearchTerm(searchTerm: string): Promise<void> {
-        return this.productOperations.verifyAllProductsMatchSearchTerm(searchTerm);
-    }
-
-    // Category Operations - Delegated
+    // Category methods
     async clickShortageTab(): Promise<void> {
-        return this.categoryOperations.clickShortageTab();
+        await ui5.userInteraction.click(WorklistPage.SHORTAGE_TAB_SELECTOR);
     }
 
     async clickPlentyInStockTab(): Promise<void> {
-        return this.categoryOperations.clickPlentyInStockTab();
+        await ui5.userInteraction.click(WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR);
     }
 
     async clickCategoryTab(category: string): Promise<void> {
-        return this.categoryOperations.clickCategoryTab(category, () => this.waitForPageLoaded());
+        const config = this.getCategoryConfig(category as ProductCategory);
+        await config.clickMethod();
+        await this.waitForPageLoaded();
     }
 
     async getTotalProductsCount(): Promise<number> {
-        return this.categoryOperations.getTotalProductsCount();
+        const countText = await ui5.element.getPropertyValue(WorklistPage.TOTAL_PRODUCTS_TAB_SELECTOR, "count");
+        return parseInt(countText, 10);
     }
 
     async getCategoryCount(category: string): Promise<number> {
-        return this.categoryOperations.getCategoryCount(category);
+        const config = this.getCategoryConfig(category as ProductCategory);
+        const countText = await ui5.element.getPropertyValue(config.selector, "count");
+        return parseInt(countText, 10);
     }
 
-    // Action Operations - Delegated
+    private getCategoryConfig(category: ProductCategory) {
+        const configs: Record<ProductCategory, { selector: QmateSelector; clickMethod: () => Promise<void> }> = {
+            'Shortage': {
+                selector: WorklistPage.SHORTAGE_TAB_SELECTOR,
+                clickMethod: () => this.clickShortageTab()
+            },
+            'Plenty in Stock': {
+                selector: WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR,
+                clickMethod: () => this.clickPlentyInStockTab()
+            }
+        };
+        const config = configs[category];
+        if (!config) {
+            throw new Error(`Unknown category: ${category}`);
+        }
+        return config;
+    }
+
+    // Action methods
     async selectFirstProductCheckbox(): Promise<void> {
-        return this.actionOperations.selectFirstProductCheckbox();
+        const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
+        this.validateCheckboxesExist(allCheckboxes);
+        const firstProductCheckboxIndex = this.calculateCheckboxIndex(0, allCheckboxes.length);
+        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, firstProductCheckboxIndex);
     }
 
     async selectProductCheckboxByIndex(productIndex: number): Promise<void> {
-        return this.actionOperations.selectProductCheckboxByIndex(productIndex);
-    }
-
-    async selectProductCheckboxByName(productName: string): Promise<void> {
-        return this.actionOperations.selectProductCheckboxByName(
-            productName,
-            (name) => this.findProductIndexByName(name),
-            (index, name) => {
-                if (index === -1) {
-                    throw new Error(`Product "${name}" not found in the list`);
-                }
-            }
-        );
+        const allCheckboxes = await ui5.element.getAllDisplayed(WorklistPage.PRODUCT_CHECKBOX_SELECTOR);
+        this.validateCheckboxesExist(allCheckboxes);
+        const checkboxIndex = this.calculateCheckboxIndex(productIndex, allCheckboxes.length);
+        await ui5.userInteraction.click(WorklistPage.PRODUCT_CHECKBOX_SELECTOR, checkboxIndex);
     }
 
     async clickOrderButton(): Promise<void> {
-        return this.actionOperations.clickOrderButton();
+        await ui5.userInteraction.click(WorklistPage.ORDER_BUTTON_SELECTOR);
     }
 
-    async clickRemoveButtonByIndex(index: number): Promise<void> {
-        return this.actionOperations.clickRemoveButtonByIndex(index);
+    async clickRemoveButtonByIndex(_index: number): Promise<void> {
+        await ui5.element.getDisplayed(WorklistPage.REMOVE_BUTTON_SELECTOR);
+        await ui5.userInteraction.click(WorklistPage.REMOVE_BUTTON_SELECTOR);
+    }
+
+    private validateCheckboxesExist(checkboxes: unknown[]): void {
+        if (checkboxes.length === 0) {
+            throw new Error('No checkboxes found in the list');
+        }
+    }
+
+    private calculateCheckboxIndex(productIndex: number, totalCheckboxes: number): number {
+        return totalCheckboxes > 1 ? productIndex + 1 : productIndex;
+    }
+
+    // Search method
+    async searchProduct(productName: string): Promise<void> {
+        await ui5.userInteraction.searchFor(WorklistPage.SEARCH_FIELD_SELECTOR, productName);
     }
 }
 

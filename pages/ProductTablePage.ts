@@ -1,41 +1,53 @@
-import type { Product } from '../../interfaces/productInterface.js';
+import type { Product } from '../interfaces/productInterface.js';
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 
-export class ProductOperations {
-    private readonly productNameSelector: QmateSelector;
-    private readonly productSupplierSelector: QmateSelector;
-    private readonly productPriceSelector: QmateSelector;
-    private readonly productUnitsSelector: QmateSelector;
-    private readonly searchFieldSelector: QmateSelector;
+class ProductTablePage {
+    // Product table selectors - these identify elements within the product table
+    private static readonly PRODUCT_NAME_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.ObjectIdentifier"
+        }
+    };
 
-    constructor(
-        productNameSelector: QmateSelector,
-        productSupplierSelector: QmateSelector,
-        productPriceSelector: QmateSelector,
-        productUnitsSelector: QmateSelector,
-        searchFieldSelector: QmateSelector
-    ) {
-        this.productNameSelector = productNameSelector;
-        this.productSupplierSelector = productSupplierSelector;
-        this.productPriceSelector = productPriceSelector;
-        this.productUnitsSelector = productUnitsSelector;
-        this.searchFieldSelector = searchFieldSelector;
-    }
+    private static readonly PRODUCT_SUPPLIER_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.Text",
+            text: [{ path: "Supplier/CompanyName" }]
+        }
+    };
+
+    private static readonly PRODUCT_PRICE_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.ObjectNumber",
+            number: [{ path: "UnitPrice" }]
+        }
+    };
+
+    private static readonly PRODUCT_UNITS_SELECTOR: QmateSelector = {
+        elementProperties: {
+            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+            metadata: "sap.m.ObjectNumber",
+            number: [{ path: "UnitsInStock" }]
+        }
+    };
 
     async getProductName(index: number = 0): Promise<string> {
-        return await ui5.element.getPropertyValue(this.productNameSelector, "title", index);
+        return await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_NAME_SELECTOR, "title", index);
     }
 
     async getProductSupplier(index: number = 0): Promise<string> {
-        return await ui5.element.getPropertyValue(this.productSupplierSelector, "text", index);
+        return await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_SUPPLIER_SELECTOR, "text", index);
     }
 
     async getProductPrice(index: number = 0): Promise<string> {
-        return await ui5.element.getPropertyValue(this.productPriceSelector, "number", index);
+        return await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_PRICE_SELECTOR, "number", index);
     }
 
     async getProductUnitsInStock(index: number = 0): Promise<string> {
-        return await ui5.element.getPropertyValue(this.productUnitsSelector, "number", index);
+        return await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_UNITS_SELECTOR, "number", index);
     }
 
     async getProductDetails(index: number = 0): Promise<Product> {
@@ -48,24 +60,20 @@ export class ProductOperations {
     }
 
     async clickFirstProduct(): Promise<void> {
-        await ui5.userInteraction.click(this.productNameSelector, 0);
+        await ui5.userInteraction.click(ProductTablePage.PRODUCT_NAME_SELECTOR, 0);
     }
 
     async clickProductByIndex(index: number): Promise<void> {
-        await ui5.userInteraction.click(this.productNameSelector, index);
-    }
-
-    async searchProduct(productName: string): Promise<void> {
-        await ui5.userInteraction.searchFor(this.searchFieldSelector, productName);
+        await ui5.userInteraction.click(ProductTablePage.PRODUCT_NAME_SELECTOR, index);
     }
 
     async getVisibleProductCount(): Promise<number> {
-        const products = await ui5.element.getAllDisplayed(this.productNameSelector);
+        const products = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
         return products.length;
     }
 
     async getAllProducts(): Promise<Product[]> {
-        const products = await ui5.element.getAllDisplayed(this.productNameSelector);
+        const products = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
         const productPromises = Array.from({ length: products.length }, (_, i) => this.getProductDetails(i));
         return Promise.all(productPromises);
     }
@@ -115,3 +123,6 @@ export class ProductOperations {
         }
     }
 }
+
+export default new ProductTablePage();
+

@@ -1,6 +1,7 @@
 import { Given, When, Then } from '@wdio/cucumber-framework';
 import { attachScreenshot } from '../helpers/screenShotHelper.js';
 import WorklistPage from '../pages/WorklistPage.js';
+import ProductTablePage from '../pages/ProductTablePage.js';
 import ProductDetailsPage from '../pages/ProductDetailsPage.js';
 import type { Product } from '../interfaces/productInterface.js';
 import type { ProductCounts } from '../interfaces/productCounts.js';
@@ -13,10 +14,10 @@ Given('Open the app {string}', async function (url: string) {
 
 // Scenario 1 - Product Info Consistency
 When('Select product at index {int} from the worklist', async function (productIndex: number) {
-    const worklistProduct = await WorklistPage.getProductDetails(productIndex);
+    const worklistProduct = await ProductTablePage.getProductDetails(productIndex);
     this.addProductToStorage(worklistProduct);
 
-    await WorklistPage.clickProductByIndex(productIndex);
+    await ProductTablePage.clickProductByIndex(productIndex);
     await ProductDetailsPage.waitForPageLoaded();
 
     const detailsProduct = await ProductDetailsPage.getProductInfo();
@@ -49,7 +50,7 @@ Given('Select product checkbox at index {int}', async function (productIndex: nu
 });
 
 Given('Note the product details at index {int}', async function (productIndex: number) {
-    const productInfo = await WorklistPage.getProductDetails(productIndex);
+    const productInfo = await ProductTablePage.getProductDetails(productIndex);
     this.addProductToStorage(productInfo);
     await attachScreenshot(`Product Noted: ${productInfo.name} with ${productInfo.unitsInStock} units`);
 });
@@ -70,7 +71,7 @@ Then('Verify the product appears in the list with increased units', async functi
     const products = this.getProducts();
     const originalProduct = products[0];
 
-    const currentProduct = await WorklistPage.findProductDetailsByName(originalProduct.name);
+    const currentProduct = await ProductTablePage.findProductDetailsByName(originalProduct.name);
 
     const originalUnits = parseFloat(originalProduct.unitsInStock);
     const currentUnits = parseFloat(currentProduct.unitsInStock);
@@ -123,13 +124,13 @@ Then('Verify the product is not displayed in any listing', async function () {
     const products = this.getProducts();
     const deletedProduct = products[products.length - 1];
 
-    const isInAllTab = await WorklistPage.isProductInList(deletedProduct.name);
+    const isInAllTab = await ProductTablePage.isProductInList(deletedProduct.name);
     await WorklistPage.clickShortageTab();
     await WorklistPage.waitForPageLoaded();
-    const isInShortageTab = await WorklistPage.isProductInList(deletedProduct.name);
+    const isInShortageTab = await ProductTablePage.isProductInList(deletedProduct.name);
     await WorklistPage.clickPlentyInStockTab();
     await WorklistPage.waitForPageLoaded();
-    const isInPlentyTab = await WorklistPage.isProductInList(deletedProduct.name);
+    const isInPlentyTab = await ProductTablePage.isProductInList(deletedProduct.name);
 
     await common.assertion.expectFalse(isInAllTab);
     await common.assertion.expectFalse(isInShortageTab);
@@ -139,7 +140,7 @@ Then('Verify the product is not displayed in any listing', async function () {
 
 // Scenario 4 - Product Search
 Given('Note the product name at index {int}', async function (productIndex: number) {
-    const productInfo = await WorklistPage.getProductDetails(productIndex);
+    const productInfo = await ProductTablePage.getProductDetails(productIndex);
     this.addProductToStorage(productInfo);
     await attachScreenshot(`Product name noted: ${productInfo.name}`);
 });
@@ -158,12 +159,12 @@ Then('Verify only products matching the search query are displayed', async funct
     const products = this.getProducts();
     const searchTerm = products[products.length - 1].name;
 
-    await WorklistPage.verifyAllProductsMatchSearchTerm(searchTerm);
+    await ProductTablePage.verifyAllProductsMatchSearchTerm(searchTerm);
     await attachScreenshot(`Verified all products match search term: "${searchTerm}"`);
 });
 
 Then('Verify the result count is {int}', async function (expectedCount: number) {
-    const actualCount = await WorklistPage.getVisibleProductCount();
+    const actualCount = await ProductTablePage.getVisibleProductCount();
     await common.assertion.expectEqual(actualCount, expectedCount);
     await attachScreenshot(`Result Count Verified: ${actualCount}`);
 });
