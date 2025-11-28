@@ -78,14 +78,6 @@ class ProductTablePage {
         return Promise.all(productPromises);
     }
 
-    async getRandomProduct(): Promise<Product> {
-        const products = await this.getAllProducts();
-        if (products.length === 0) {
-            throw new Error('No products found in the current view');
-        }
-        const randomIndex = Math.floor(Math.random() * products.length);
-        return products[randomIndex];
-    }
 
     async findProductDetailsByName(productName: string): Promise<Product> {
         const products = await this.getAllProducts();

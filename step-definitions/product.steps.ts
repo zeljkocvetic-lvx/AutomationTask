@@ -16,7 +16,10 @@ Given('Open the app', async function () {
 // Scenario 1 - Product Info Consistency
 Given('Select random product from {string} category', async function (category: string) {
     await WorklistPage.clickCategoryTab(category);
-    const selectedProduct = await ProductTablePage.getRandomProduct();
+    const products = await ProductTablePage.getAllProducts();
+
+    const randomIndex = Math.floor(Math.random() * products.length);
+    const selectedProduct = products[randomIndex];
     this.setSelectedProduct(selectedProduct);
     this.addProductToStorage(selectedProduct);
     await attachScreenshot(`Selected random product "${selectedProduct.name}" from ${category} category`);
@@ -24,7 +27,9 @@ Given('Select random product from {string} category', async function (category: 
 
 Given('Select random product from {string} tab', async function (tab: string) {
     await WorklistPage.clickCategoryTab(tab);
-    const selectedProduct = await ProductTablePage.getRandomProduct();
+    const products = await ProductTablePage.getAllProducts();
+    const randomIndex = Math.floor(Math.random() * products.length);
+    const selectedProduct = products[randomIndex];
     this.setSelectedProduct(selectedProduct);
     this.addProductToStorage(selectedProduct);
     await attachScreenshot(`Selected random product "${selectedProduct.name}" from ${tab} tab`);
