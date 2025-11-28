@@ -14,25 +14,20 @@ Given('Open the app', async function () {
 });
 
 // Scenario 1 - Product Info Consistency
-Given('Select random product from {string} category', async function (category: string) {
-    await WorklistPage.clickCategoryTab(category);
-    const products = await ProductTablePage.getAllProducts();
-
-    const randomIndex = Math.floor(Math.random() * products.length);
-    const selectedProduct = products[randomIndex];
+Given('Select product {string} from {string} tab', async function (productName: string, tab: string) {
+    await WorklistPage.clickCategoryTab(tab);
+    const selectedProduct = await ProductTablePage.findProductDetailsByName(productName);
     this.setSelectedProduct(selectedProduct);
     this.addProductToStorage(selectedProduct);
-    await attachScreenshot(`Selected random product "${selectedProduct.name}" from ${category} category`);
+    await attachScreenshot(`Selected product "${productName}" from ${tab} tab`);
 });
 
-Given('Select random product from {string} tab', async function (tab: string) {
-    await WorklistPage.clickCategoryTab(tab);
-    const products = await ProductTablePage.getAllProducts();
-    const randomIndex = Math.floor(Math.random() * products.length);
-    const selectedProduct = products[randomIndex];
+Given('Select product {string} from {string} category', async function (productName: string, category: string) {
+    await WorklistPage.clickCategoryTab(category);
+    const selectedProduct = await ProductTablePage.findProductDetailsByName(productName);
     this.setSelectedProduct(selectedProduct);
     this.addProductToStorage(selectedProduct);
-    await attachScreenshot(`Selected random product "${selectedProduct.name}" from ${tab} tab`);
+    await attachScreenshot(`Selected product "${productName}" from ${category} category`);
 });
 
 When('Open product details page for the selected product', async function () {

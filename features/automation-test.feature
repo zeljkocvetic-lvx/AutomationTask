@@ -9,14 +9,14 @@ Feature: Product Management in SAP UI5 Worklist Application
 
     @scenario1
     Scenario: Product Info Consistency
-        Given Select random product from "All Products" tab
+        Given Select product "Chai" from "All Products" tab
         When Open product details page for the selected product
         Then Verify product details page displays matching information for all fields
 
     @scenario2
     Scenario: Product Order Flow
         Given Open the "Shortage" category tab
-        And Select random product from "Shortage" category
+        And Select product "Northwoods Cranberry Sauce" from "Shortage" category
         When Order the selected product
         Then Open the "Plenty in Stock" category tab
         And Verify the product appears in the list with increased units
@@ -25,16 +25,16 @@ Feature: Product Management in SAP UI5 Worklist Application
     Scenario Outline: Product Deletion
         Given Note the total products count and "<category>" category count
         And Open the "<category>" category tab
-        And Select random product from "<category>" category
+        And Select product "<product_name>" from "<category>" category
         When Delete the selected product
         Then Verify the total number of products decreased by <decrease_amount>
         And Verify the "<category>" category count decreased by <decrease_amount>
         And Verify the product is not displayed in any listing
 
         Examples:
-            | category        | decrease_amount |
-            | Shortage        | 1               |
-            | Plenty in Stock | 1               |
+            | category        | product_name               | decrease_amount |
+            | Shortage        | Northwoods Cranberry Sauce | 1               |
+            | Plenty in Stock | Ikura                      | 1               |
 
     @scenario4
     Scenario: Product Search
