@@ -17,14 +17,15 @@ Feature: Product Management in SAP UI5 Worklist Application
     @scenario2
     Scenario: Product Order Flow
         When Open the "Shortage" category tab
+        And Get "Northwoods Cranberry Sauce" product details
         And Order product "Northwoods Cranberry Sauce"
         And Open the "Plenty in Stock" category tab
         Then Verify product "Northwoods Cranberry Sauce" appears in the list with increased units
 
     @scenario3
     Scenario Outline: Product Deletion
-        When Open the "<category>" category tab
-        And Get the total products count
+        When Get the total products count
+        And Open the "<category>" category tab
         And Get the "<category>" category count
         And Delete product "<product_name>"
         Then Verify the total number of products decreased by "<decrease_amount>"
