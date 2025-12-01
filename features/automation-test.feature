@@ -10,6 +10,7 @@ Feature: Product Management in SAP UI5 Worklist Application
     @scenario1
     Scenario: Product Info Consistency
         When Open the "All Products" category tab
+        And Get "Chai" product details
         And Open "Chai" product page
         Then Verify product details page displays matching information for all fields
 
@@ -26,8 +27,8 @@ Feature: Product Management in SAP UI5 Worklist Application
         Given Get the total products count
         And Get the "<category>" category count
         And Delete product "<product_name>"
-        Then Verify the total number of products decreased by "<decrease_amount">
-        And Verify the "<category>" category count decreased by "<decrease_amount">
+        Then Verify the total number of products decreased by "<decrease_amount>"
+        And Verify the "<category>" category count decreased by "<decrease_amount>"
         And Verify product "<product_name>" is not displayed in "<category>" listing
 
         Examples:
