@@ -24,12 +24,15 @@ Feature: Product Management in SAP UI5 Worklist Application
     @scenario3
     Scenario Outline: Product Deletion
         When Open the "<category>" category tab
-        Given Get the total products count
+        And Get the total products count
         And Get the "<category>" category count
         And Delete product "<product_name>"
         Then Verify the total number of products decreased by "<decrease_amount>"
         And Verify the "<category>" category count decreased by "<decrease_amount>"
-        And Verify product "<product_name>" is not displayed in "<category>" listing
+        And Verify product "<product_name>" is not displayed in "All Products" listing
+        And Verify product "<product_name>" is not displayed in "Shortage" listing
+        And Verify product "<product_name>" is not displayed in "Out of Stock" listing
+        And Verify product "<product_name>" is not displayed in "Plenty in Stock" listing
 
         Examples:
             | category        | product_name               | decrease_amount |
