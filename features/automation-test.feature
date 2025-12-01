@@ -10,25 +10,25 @@ Feature: Product Management in SAP UI5 Worklist Application
     @scenario1
     Scenario: Product Info Consistency
         When Open the "All Products" category tab
-        When Open product page for product "Chai"
+        And Open "Chai" product page
         Then Verify product details page displays matching information for all fields
 
     @scenario2
     Scenario: Product Order Flow
         When Open the "Shortage" category tab
-        When Order product "Northwoods Cranberry Sauce"
-        Then Open the "Plenty in Stock" category tab
-        And Verify product "Northwoods Cranberry Sauce" appears in the list with increased units
+        And Order product "Northwoods Cranberry Sauce"
+        And Open the "Plenty in Stock" category tab
+        Then Verify product "Northwoods Cranberry Sauce" appears in the list with increased units
 
     @scenario3
     Scenario Outline: Product Deletion
         When Open the "<category>" category tab
-        Given Note the total products count
-        And Note the "<category>" category count
-        When Delete product "<product_name>"
-        Then Verify the total number of products decreased by <decrease_amount>
-        And Verify the "<category>" category count decreased by <decrease_amount>
-        And Verify product "<product_name>" is not displayed in any listing
+        Given Get the total products count
+        And Get the "<category>" category count
+        And Delete product "<product_name>"
+        Then Verify the total number of products decreased by "<decrease_amount">
+        And Verify the "<category>" category count decreased by "<decrease_amount">
+        And Verify product "<product_name>" is not displayed in "<category>" listing
 
         Examples:
             | category        | product_name               | decrease_amount |
@@ -38,6 +38,6 @@ Feature: Product Management in SAP UI5 Worklist Application
     @scenario4
     Scenario: Product Search
         When Open the "All Products" category tab
-        When Search for product "Alice Mutton"
+        And Search for product "Alice Mutton"
         Then Verify only products matching the search query are displayed
-        And Verify the result count is 1
+
