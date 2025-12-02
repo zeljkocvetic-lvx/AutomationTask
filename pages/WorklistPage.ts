@@ -1,24 +1,19 @@
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 import { BasePage } from './BasePage.js';
 
-class WorklistPage extends BasePage {
-    private static readonly CATEGORY_TO_TEXT_PATH_MAP: Record<string, string> = {
-        'Shortage': 'i18n>WorklistFilterShortage',
-        'Plenty in Stock': 'i18n>WorklistFilterInStock',
-        'All Products': 'i18n>WorklistFilterProductsAll'
-    };
+enum CategoryTab {
+    'Shortage' = 'i18n>WorklistFilterShortage',
+    'Plenty in Stock' = 'i18n>WorklistFilterInStock',
+    'All Products' = 'i18n>WorklistFilterProductsAll'
+}
 
-    // Common category tab selector builder
+class WorklistPage extends BasePage {
     private getCategoryTabSelector(category: string): QmateSelector {
-        const i18nPath = WorklistPage.CATEGORY_TO_TEXT_PATH_MAP[category];
-        if (!i18nPath) {
-            throw new Error(`Unknown category: ${category}`);
-        }
         return {
             elementProperties: {
                 viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
                 metadata: "sap.m.IconTabFilter",
-                text: [{ path: i18nPath }]
+                text: [{ path: CategoryTab[category as keyof typeof CategoryTab] }]
             }
         };
     }
@@ -75,11 +70,8 @@ class WorklistPage extends BasePage {
 
     // Category methods
     async openCategoryTab(category: string): Promise<void> {
-        if (category !== 'All Products') {
-            const selector = this.getCategoryTabSelector(category);
-            await ui5.userInteraction.click(selector);
-            await this.waitForPageLoaded();
-        }
+        const selector = this.getCategoryTabSelector(category);
+        await ui5.userInteraction.click(selector);
     }
 
     async getTotalProductsCount(): Promise<number> {
