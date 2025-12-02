@@ -10,6 +10,7 @@ export const config: WebdriverIO.Config = {
     capabilities: [{
         browserName: 'chrome',
         'goog:chromeOptions': {
+            binary: '/Applications/Google Chrome 2.app/Contents/MacOS/Google Chrome',
             args: [
                 '--no-sandbox',
                 '--lang-en-US',
@@ -29,12 +30,17 @@ export const config: WebdriverIO.Config = {
 
     framework: 'cucumber',
 
-    reporters: [['allure', {
-        outputDir: 'allure-results',
-        disableWebdriverStepsReporting: true,
-        disableWebdriverScreenshotsReporting: false,
-        useCucumberStepReporter: true
-    }]],
+    reporters: [
+        ['spec', {
+            showPreface: false
+        }],
+        ['allure', {
+            outputDir: 'allure-results',
+            disableWebdriverStepsReporting: true,
+            disableWebdriverScreenshotsReporting: false,
+            useCucumberStepReporter: true
+        }]
+    ],
 
     cucumberOpts: {
         require: [

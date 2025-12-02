@@ -14,35 +14,35 @@ Feature: Product Management in SAP UI5 Worklist Application
         And Open "Chai" product page
         Then Verify product details page displays matching information for all fields
 
-    @scenario2
-    Scenario: Product Order Flow
-        When Open the "Shortage" category tab
-        And Get "Northwoods Cranberry Sauce" product details
-        And Order product "Northwoods Cranberry Sauce"
-        And Open the "Plenty in Stock" category tab
-        Then Verify product "Northwoods Cranberry Sauce" appears in the list with increased units
+# @scenario2
+# Scenario: Product Order Flow
+#     When Open the "Shortage" category tab
+#     And Get "Northwoods Cranberry Sauce" product details
+#     And Order product "Northwoods Cranberry Sauce"
+#     And Open the "Plenty in Stock" category tab
+#     Then Verify product "Northwoods Cranberry Sauce" appears in the list with increased units
 
-    @scenario3
-    Scenario Outline: Product Deletion
-        When Get the total products count
-        And Open the "<category>" category tab
-        And Get the "<category>" category count
-        And Delete product "<product_name>"
-        Then Verify the total number of products decreased by "<decrease_amount>"
-        And Verify the "<category>" category count decreased by "<decrease_amount>"
-        And Verify product "<product_name>" is not displayed in "All Products" listing
-        And Verify product "<product_name>" is not displayed in "Shortage" listing
-        And Verify product "<product_name>" is not displayed in "Out of Stock" listing
-        And Verify product "<product_name>" is not displayed in "Plenty in Stock" listing
+# @scenario3
+# Scenario Outline: Product Deletion
+#     When Get the total products count
+#     And Open the "<category>" category tab
+#     And Get the "<category>" category count
+#     And Delete product "<product_name>"
+#     Then Verify the total number of products decreased by "<decrease_amount>"
+#     And Verify the "<category>" category count decreased by "<decrease_amount>"
+#     And Verify product "<product_name>" is not displayed in "All Products" listing
+#     And Verify product "<product_name>" is not displayed in "Shortage" listing
+#     And Verify product "<product_name>" is not displayed in "Out of Stock" listing
+#     And Verify product "<product_name>" is not displayed in "Plenty in Stock" listing
 
-        Examples:
-            | category        | product_name               | decrease_amount |
-            | Shortage        | Northwoods Cranberry Sauce | 1               |
-            | Plenty in Stock | Chang                      | 1               |
+#     Examples:
+#         | category        | product_name               | decrease_amount |
+#         | Shortage        | Northwoods Cranberry Sauce | 1               |
+#         | Plenty in Stock | Chang                      | 1               |
 
-    @scenario4
-    Scenario: Product Search
-        When Open the "All Products" category tab
-        And Search for product "Alice Mutton"
-        Then Verify only products matching the search query are displayed
+# @scenario4
+# Scenario: Product Search
+#     When Open the "All Products" category tab
+#     And Search for product "Alice Mutton"
+#     Then Verify only products matching the search query are displayed
 

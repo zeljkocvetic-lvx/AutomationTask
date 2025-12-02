@@ -88,7 +88,7 @@ class WorklistPage extends BasePage {
         await ui5.userInteraction.click(WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR);
     }
 
-    async clickCategoryTab(category: string): Promise<void> {
+    async openCategoryTab(category: string): Promise<void> {
         const config = this.getCategoryConfig(category as ProductCategory);
         await config.clickMethod();
         await this.waitForPageLoaded();

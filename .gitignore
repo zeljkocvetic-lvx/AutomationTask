@@ -7,7 +7,6 @@ allure-report/
 node_modules/
 *.allure
 package-lock.json
-package.json
 
 # Logs
 logs/

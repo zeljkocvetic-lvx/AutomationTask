@@ -75,34 +75,45 @@ class ProductTablePage {
     }
 
 
+    async findProductIndexByName(productName: string): Promise<number> {
+        const productNameElements = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
+
+        for (let i = 0; i < productNameElements.length; i++) {
+
+            const name = await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_NAME_SELECTOR, "title", i);
+
+            if (name === productName) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     async findProductDetailsByName(productName: string): Promise<Product> {
-        const products = await this.getAllProducts();
-        const product = products.find(product => product.name === productName);
-        if (!product) {
+
+        const index = await this.findProductIndexByName(productName);
+
+        if (index === -1) {
             throw new Error(`Product "${productName}" not found in the list`);
         }
-        return product;
+        return await this.getProductDetails(index);
     }
 
-    async findProductIndexByName(productName: string): Promise<number> {
-        const products = await this.getAllProducts();
-        const index = products.findIndex(product => product.name === productName);
-        return index;
-    }
 
     async clickProductByName(productName: string): Promise<void> {
+
         const index = await this.findProductIndexByName(productName);
-        this.validateProductIndex(index, productName);
+
+        if (index === -1) {
+            throw new Error(`Product "${productName}" not found in the list`);
+        }
         await this.clickProductByIndex(index);
     }
 
+
     async isProductInList(productName: string): Promise<boolean> {
-        try {
-            await this.findProductDetailsByName(productName);
-            return true;
-        } catch {
-            return false;
-        }
+        const index = await this.findProductIndexByName(productName);
+        return index !== -1;
     }
 
     async verifyAllProductsMatchSearchTerm(searchTerm: string): Promise<void> {
@@ -111,12 +122,6 @@ class ProductTablePage {
             if (!product.name.toLowerCase().includes(searchTerm.toLowerCase())) {
                 throw new Error(`Product "${product.name}" does not match search term "${searchTerm}"`);
             }
-        }
-    }
-
-    private validateProductIndex(index: number, productName: string): void {
-        if (index === -1) {
-            throw new Error(`Product "${productName}" not found in the list`);
         }
     }
 }
