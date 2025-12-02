@@ -50,7 +50,15 @@ class ProductTablePage {
         return await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_UNITS_SELECTOR, "number", index);
     }
 
-    async getProductDetails(index: number = 0): Promise<Product> {
+    async getProductDetails(productName: string): Promise<Product> {
+        const index = await this.findProductIndexByName(productName);
+        if (index === -1) {
+            throw new Error(`Product "${productName}" not found in the list`);
+        }
+        return await this.getProductDetailsByIndex(index);
+    }
+
+    private async getProductDetailsByIndex(index: number): Promise<Product> {
         const name = await this.getProductName(index);
         const supplier = await this.getProductSupplier(index);
         const price = await this.getProductPrice(index);
@@ -70,7 +78,7 @@ class ProductTablePage {
 
     async getAllProducts(): Promise<Product[]> {
         const products = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
-        const productPromises = Array.from({ length: products.length }, (_, i) => this.getProductDetails(i));
+        const productPromises = Array.from({ length: products.length }, (_, i) => this.getProductDetailsByIndex(i));
         return Promise.all(productPromises);
     }
 
@@ -89,15 +97,6 @@ class ProductTablePage {
         return -1;
     }
 
-    async findProductDetailsByName(productName: string): Promise<Product> {
-
-        const index = await this.findProductIndexByName(productName);
-
-        if (index === -1) {
-            throw new Error(`Product "${productName}" not found in the list`);
-        }
-        return await this.getProductDetails(index);
-    }
 
 
     async clickProductByName(productName: string): Promise<void> {

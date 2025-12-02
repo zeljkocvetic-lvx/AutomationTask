@@ -1,32 +1,27 @@
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 import { BasePage } from './BasePage.js';
-import type { ProductCategory } from '../types/productCategory.js';
 
 class WorklistPage extends BasePage {
-    // Category-related selectors
-    private static readonly SHORTAGE_TAB_SELECTOR: QmateSelector = {
-        elementProperties: {
-            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-            metadata: "sap.m.IconTabFilter",
-            text: [{ path: "i18n>WorklistFilterShortage" }]
-        }
+    private static readonly CATEGORY_TO_TEXT_PATH_MAP: Record<string, string> = {
+        'Shortage': 'i18n>WorklistFilterShortage',
+        'Plenty in Stock': 'i18n>WorklistFilterInStock',
+        'All Products': 'i18n>WorklistFilterProductsAll'
     };
 
-    private static readonly PLENTY_IN_STOCK_TAB_SELECTOR: QmateSelector = {
-        elementProperties: {
-            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-            metadata: "sap.m.IconTabFilter",
-            text: [{ path: "i18n>WorklistFilterInStock" }]
+    // Common category tab selector builder
+    private getCategoryTabSelector(category: string): QmateSelector {
+        const i18nPath = WorklistPage.CATEGORY_TO_TEXT_PATH_MAP[category];
+        if (!i18nPath) {
+            throw new Error(`Unknown category: ${category}`);
         }
-    };
-
-    private static readonly TOTAL_PRODUCTS_TAB_SELECTOR: QmateSelector = {
-        elementProperties: {
-            viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-            metadata: "sap.m.IconTabFilter",
-            text: [{ path: "i18n>WorklistFilterProductsAll" }]
-        }
-    };
+        return {
+            elementProperties: {
+                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                metadata: "sap.m.IconTabFilter",
+                text: [{ path: i18nPath }]
+            }
+        };
+    }
 
     // Action-related selectors
     private static readonly PRODUCT_CHECKBOX_SELECTOR: QmateSelector = {
@@ -61,7 +56,6 @@ class WorklistPage extends BasePage {
         }
     };
 
-    // Product name selector - used only for waitForPageLoaded
     private static readonly PRODUCT_NAME_SELECTOR: QmateSelector = {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
@@ -80,52 +74,24 @@ class WorklistPage extends BasePage {
     }
 
     // Category methods
-    async clickShortageTab(): Promise<void> {
-        await ui5.userInteraction.click(WorklistPage.SHORTAGE_TAB_SELECTOR);
-    }
-
-    async clickPlentyInStockTab(): Promise<void> {
-        await ui5.userInteraction.click(WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR);
-    }
-
     async openCategoryTab(category: string): Promise<void> {
-        const config = this.getCategoryConfig(category as ProductCategory);
-        await config.clickMethod();
-        await this.waitForPageLoaded();
+        if (category !== 'All Products') {
+            const selector = this.getCategoryTabSelector(category);
+            await ui5.userInteraction.click(selector);
+            await this.waitForPageLoaded();
+        }
     }
 
     async getTotalProductsCount(): Promise<number> {
-        const countText = await ui5.element.getPropertyValue(WorklistPage.TOTAL_PRODUCTS_TAB_SELECTOR, "count");
+        const selector = this.getCategoryTabSelector('All Products');
+        const countText = await ui5.element.getPropertyValue(selector, "count");
         return parseInt(countText, 10);
     }
 
     async getCategoryCount(category: string): Promise<number> {
-        const config = this.getCategoryConfig(category as ProductCategory);
-        const countText = await ui5.element.getPropertyValue(config.selector, "count");
+        const selector = this.getCategoryTabSelector(category);
+        const countText = await ui5.element.getPropertyValue(selector, "count");
         return parseInt(countText, 10);
-    }
-
-    private getCategoryConfig(category: ProductCategory) {
-        const configs: Record<ProductCategory, { selector: QmateSelector; clickMethod: () => Promise<void> }> = {
-            'Shortage': {
-                selector: WorklistPage.SHORTAGE_TAB_SELECTOR,
-                clickMethod: () => this.clickShortageTab()
-            },
-            'Plenty in Stock': {
-                selector: WorklistPage.PLENTY_IN_STOCK_TAB_SELECTOR,
-                clickMethod: () => this.clickPlentyInStockTab()
-            },
-            'All Products': {
-                selector: WorklistPage.TOTAL_PRODUCTS_TAB_SELECTOR,
-                clickMethod: async () => {
-                }
-            }
-        };
-        const config = configs[category];
-        if (!config) {
-            throw new Error(`Unknown category: ${category}`);
-        }
-        return config;
     }
 
     // Action methods
