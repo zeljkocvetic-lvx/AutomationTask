@@ -51,24 +51,37 @@ class ProductTablePage {
     }
 
     async getProductDetails(productName: string): Promise<Product> {
-        const index = await this.findProductIndexByName(productName);
-        if (index === -1) {
+        const position = await this.findProductPosition(productName);
+        if (position === -1) {
             throw new Error(`Product "${productName}" not found in the list`);
         }
-        return await this.getProductDetailsByIndex(index);
+        return await this.getProductDetailsByPosition(position);
     }
 
-    private async getProductDetailsByIndex(index: number): Promise<Product> {
-        const name = await this.getProductName(index);
-        const supplier = await this.getProductSupplier(index);
-        const price = await this.getProductPrice(index);
-        const unitsInStock = await this.getProductUnitsInStock(index);
+    private async getProductDetailsByPosition(position: number): Promise<Product> {
+        const name = await this.getProductName(position);
+        const supplier = await this.getProductSupplier(position);
+        const price = await this.getProductPrice(position);
+        const unitsInStock = await this.getProductUnitsInStock(position);
 
         return { name, supplier, price, unitsInStock };
     }
 
-    async clickProductByIndex(index: number): Promise<void> {
-        await ui5.userInteraction.click(ProductTablePage.PRODUCT_NAME_SELECTOR, index);
+    async clickProduct(productName: string): Promise<void> {
+        const productNameElements = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
+        for (let i = 0; i < productNameElements.length; i++) {
+            const name = await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_NAME_SELECTOR, "title", i);
+            if (name === productName) {
+                await ui5.userInteraction.click({
+                    elementProperties: {
+                        viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                        metadata: "sap.m.ObjectIdentifier",
+                        id: await productNameElements[i].getAttribute('id')
+                    }
+                });
+                return;
+            }
+        }
     }
 
     async getVisibleProductCount(): Promise<number> {
@@ -78,18 +91,16 @@ class ProductTablePage {
 
     async getAllProducts(): Promise<Product[]> {
         const products = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
-        const productPromises = Array.from({ length: products.length }, (_, i) => this.getProductDetailsByIndex(i));
+        const productPromises = Array.from({ length: products.length }, (_, i) => this.getProductDetailsByPosition(i));
         return Promise.all(productPromises);
     }
 
 
-    async findProductIndexByName(productName: string): Promise<number> {
+    async findProductPosition(productName: string): Promise<number> {
         const productNameElements = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
 
         for (let i = 0; i < productNameElements.length; i++) {
-
             const name = await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_NAME_SELECTOR, "title", i);
-
             if (name === productName) {
                 return i;
             }
@@ -97,22 +108,9 @@ class ProductTablePage {
         return -1;
     }
 
-
-
-    async clickProductByName(productName: string): Promise<void> {
-
-        const index = await this.findProductIndexByName(productName);
-
-        if (index === -1) {
-            throw new Error(`Product "${productName}" not found in the list`);
-        }
-        await this.clickProductByIndex(index);
-    }
-
-
     async isProductInList(productName: string): Promise<boolean> {
-        const index = await this.findProductIndexByName(productName);
-        return index !== -1;
+        const position = await this.findProductPosition(productName);
+        return position !== -1;
     }
 
     async verifyAllProductsMatchSearchTerm(searchTerm: string): Promise<void> {

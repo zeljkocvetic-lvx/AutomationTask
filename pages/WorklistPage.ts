@@ -87,8 +87,8 @@ class WorklistPage extends BasePage {
     }
 
     // Action methods
-    async selectProductCheckboxByName(productName: string, findProductIndexByName: (name: string) => Promise<number>): Promise<void> {
-        const productIndex = await findProductIndexByName(productName);
+    async selectProductCheckboxByName(productName: string, findProductPosition: (name: string) => Promise<number>): Promise<void> {
+        const productIndex = await findProductPosition(productName);
         if (productIndex === -1) {
             throw new Error(`Product "${productName}" not found in the list`);
         }

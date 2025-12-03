@@ -20,27 +20,25 @@ When('Open the {string} category tab', async function (category: string) {
 
 When('Get {string} product details', async function (productName: string) {
     const product = await ProductTablePage.getProductDetails(productName);
-    this.setSelectedProduct(product);
+    this.addProductToStorage(product);
     await attachScreenshot(`Got product details for "${productName}"`);
 });
 
 When('Open {string} product page', async function (productName: string) {
-    await ProductTablePage.clickProductByName(productName);
+    await ProductTablePage.clickProduct(productName);
     await ProductDetailsPage.waitForPageLoaded();
     await attachScreenshot(`Opened product page for "${productName}"`);
 });
 
 Then('Verify product details page displays matching information for all fields', async function () {
-    const worklistProduct = this.getSelectedProduct();
     const detailsProduct = await ProductDetailsPage.getProductInfo();
+    const worklistProduct = this.getProductByName(detailsProduct.name);
 
     const formatProduct = (product: Product) => `${product.name}::${product.supplier}::${product.price}::${product.unitsInStock}`;
     await common.assertion.expectEqual(
         formatProduct(detailsProduct),
         formatProduct(worklistProduct)
     );
-
-    await attachScreenshot('Product Info Verified');
 });
 
 // // Scenario 2 - Product Order Flow
