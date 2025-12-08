@@ -1,9 +1,9 @@
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 import { BasePage } from './BasePage.js';
-import { CategoryTab } from '../types/categoryTab.js';
+import { CategoryTabEnum } from '../enums/CategoryTabEnum.js';
 
 class WorklistPage extends BasePage {
-    private getCategoryTabSelector(category: CategoryTab): QmateSelector {
+    private getCategoryTabSelector(category: CategoryTabEnum): QmateSelector {
         return {
             elementProperties: {
                 viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
@@ -64,18 +64,18 @@ class WorklistPage extends BasePage {
     }
 
     // Category methods
-    async openCategoryTab(category: CategoryTab): Promise<void> {
+    async openCategoryTab(category: CategoryTabEnum): Promise<void> {
         const selector = this.getCategoryTabSelector(category);
         await ui5.userInteraction.click(selector);
     }
 
     async getTotalProductsCount(): Promise<number> {
-        const selector = this.getCategoryTabSelector(CategoryTab.AllProducts);
+        const selector = this.getCategoryTabSelector(CategoryTabEnum.AllProducts);
         const countText = await ui5.element.getPropertyValue(selector, "count");
         return parseInt(countText, 10);
     }
 
-    async getCategoryCount(category: CategoryTab): Promise<number> {
+    async getCategoryCount(category: CategoryTabEnum): Promise<number> {
         const selector = this.getCategoryTabSelector(category);
         const countText = await ui5.element.getPropertyValue(selector, "count");
         return parseInt(countText, 10);
