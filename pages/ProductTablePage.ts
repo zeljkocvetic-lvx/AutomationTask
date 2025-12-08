@@ -65,18 +65,21 @@ class ProductTablePage {
     }
 
     async getProductDetails(productName: string): Promise<Product> {
-        const position = await this.findProductPosition(productName);
-        if (position === -1) {
-            throw new Error(`Product "${productName}" not found in the list`);
-        }
-        return await this.getProductDetailsByPosition(position);
-    }
+        const productNameElements = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
+        let rowIndex = -1;
 
-    private async getProductDetailsByPosition(position: number): Promise<Product> {
-        const name = await this.getProductName(position);
-        const supplier = await this.getProductSupplier(position);
-        const price = await this.getProductPrice(position);
-        const unitsInStock = await this.getProductUnitsInStock(position);
+        for (let i = 0; i < productNameElements.length; i++) {
+            const name = await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_NAME_SELECTOR, "title", i);
+            if (name === productName) {
+                rowIndex = i;
+                break;
+            }
+        }
+
+        const name = productName;
+        const supplier = await this.getProductSupplier(rowIndex);
+        const price = await this.getProductPrice(rowIndex);
+        const unitsInStock = await this.getProductUnitsInStock(rowIndex);
 
         return { name, supplier, price, unitsInStock };
     }
@@ -92,28 +95,15 @@ class ProductTablePage {
     }
 
     async getAllProducts(): Promise<Product[]> {
-        const products = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
-        const productPromises = Array.from({ length: products.length }, (_, i) => this.getProductDetailsByPosition(i));
-        return Promise.all(productPromises);
-    }
-
-
-    async findProductPosition(productName: string): Promise<number> {
         const productNameElements = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
+        const productPromises = [];
 
         for (let i = 0; i < productNameElements.length; i++) {
             const name = await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_NAME_SELECTOR, "title", i);
-            if (name === productName) {
-                return i;
-            }
-
+            productPromises.push(this.getProductDetails(name));
         }
-        return -1;
-    }
 
-    async isProductInList(productName: string): Promise<boolean> {
-        const position = await this.findProductPosition(productName);
-        return position !== -1;
+        return Promise.all(productPromises);
     }
 
     async verifyAllProductsMatchSearchTerm(searchTerm: string): Promise<void> {
