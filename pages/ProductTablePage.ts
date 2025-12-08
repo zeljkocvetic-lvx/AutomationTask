@@ -34,6 +34,20 @@ class ProductTablePage {
         }
     };
 
+    private getTableRowSelectorByName(productName: string): QmateSelector {
+        return {
+            elementProperties: {
+                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                metadata: "sap.m.ColumnListItem"
+            },
+            descendantProperties: {
+                metadata: "sap.m.ObjectIdentifier",
+                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                title: productName
+            }
+        };
+    }
+
     async getProductName(index: number = 0): Promise<string> {
         return await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_NAME_SELECTOR, "title", index);
     }
@@ -68,20 +82,8 @@ class ProductTablePage {
     }
 
     async clickProduct(productName: string): Promise<void> {
-        const productNameElements = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
-        for (let i = 0; i < productNameElements.length; i++) {
-            const name = await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_NAME_SELECTOR, "title", i);
-            if (name === productName) {
-                await ui5.userInteraction.click({
-                    elementProperties: {
-                        viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                        metadata: "sap.m.ObjectIdentifier",
-                        id: await productNameElements[i].getAttribute('id')
-                    }
-                });
-                return;
-            }
-        }
+        const productRowSelector = this.getTableRowSelectorByName(productName);
+        await ui5.userInteraction.click(productRowSelector);
     }
 
     async getVisibleProductCount(): Promise<number> {
@@ -104,6 +106,7 @@ class ProductTablePage {
             if (name === productName) {
                 return i;
             }
+
         }
         return -1;
     }
@@ -124,4 +127,5 @@ class ProductTablePage {
 }
 
 export default new ProductTablePage();
+
 
