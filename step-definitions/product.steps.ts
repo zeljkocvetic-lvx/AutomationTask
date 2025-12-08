@@ -23,7 +23,6 @@ When('Open the {string} category tab', async function (category: string) {
 When('Get {string} product details', async function (productName: string) {
     const product = await ProductTablePage.getProductDetails(productName);
     this.addProductToStorage(product);
-    //await attachScreenshot(`Got product details for "${productName}"`);
 });
 
 When('Open {string} product page', async function (productName: string) {
