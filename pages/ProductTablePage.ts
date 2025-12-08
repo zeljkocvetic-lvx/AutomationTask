@@ -65,10 +65,10 @@ class ProductTablePage {
     }
 
     async getProductDetails(productName: string): Promise<Product> {
-        const productNameElements = await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR);
+        const productCount = (await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR)).length;
         let rowIndex = -1;
 
-        for (let i = 0; i < productNameElements.length; i++) {
+        for (let i = 0; i < productCount; i++) {
             const name = await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_NAME_SELECTOR, "title", i);
             if (name === productName) {
                 rowIndex = i;
@@ -76,12 +76,11 @@ class ProductTablePage {
             }
         }
 
-        const name = productName;
         const supplier = await this.getProductSupplier(rowIndex);
         const price = await this.getProductPrice(rowIndex);
         const unitsInStock = await this.getProductUnitsInStock(rowIndex);
 
-        return { name, supplier, price, unitsInStock };
+        return { name: productName, supplier, price, unitsInStock };
     }
 
     async clickProduct(productName: string): Promise<void> {
