@@ -65,10 +65,18 @@ class ProductTablePage {
     }
 
     async getProductDetails(productName: string): Promise<Product> {
-        const productCount = (await ui5.element.getAllDisplayed(ProductTablePage.PRODUCT_NAME_SELECTOR)).length;
-        let rowIndex = -1;
+        const rowSelector = this.getTableRowSelectorByName(productName);
+        await ui5.element.getDisplayed(rowSelector);
 
-        for (let i = 0; i < productCount; i++) {
+        const allRows = await ui5.element.getAllDisplayed({
+            elementProperties: {
+                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                metadata: "sap.m.ColumnListItem"
+            }
+        });
+
+        let rowIndex = -1;
+        for (let i = 0; i < allRows.length; i++) {
             const name = await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_NAME_SELECTOR, "title", i);
             if (name === productName) {
                 rowIndex = i;
