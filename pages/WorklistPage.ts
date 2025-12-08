@@ -1,19 +1,14 @@
 import { QmateSelector } from 'wdio-qmate-service/modules/ui5/types/ui5.types';
 import { BasePage } from './BasePage.js';
-
-enum CategoryTab {
-    'Shortage' = 'i18n>WorklistFilterShortage',
-    'Plenty in Stock' = 'i18n>WorklistFilterInStock',
-    'All Products' = 'i18n>WorklistFilterProductsAll'
-}
+import { CategoryTab } from '../types/categoryTab.js';
 
 class WorklistPage extends BasePage {
-    private getCategoryTabSelector(category: string): QmateSelector {
+    private getCategoryTabSelector(category: CategoryTab): QmateSelector {
         return {
             elementProperties: {
                 viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
                 metadata: "sap.m.IconTabFilter",
-                text: [{ path: CategoryTab[category as keyof typeof CategoryTab] }]
+                text: [{ path: category }]
             }
         };
     }
@@ -69,18 +64,18 @@ class WorklistPage extends BasePage {
     }
 
     // Category methods
-    async openCategoryTab(category: string): Promise<void> {
+    async openCategoryTab(category: CategoryTab): Promise<void> {
         const selector = this.getCategoryTabSelector(category);
         await ui5.userInteraction.click(selector);
     }
 
     async getTotalProductsCount(): Promise<number> {
-        const selector = this.getCategoryTabSelector('All Products');
+        const selector = this.getCategoryTabSelector(CategoryTab.AllProducts);
         const countText = await ui5.element.getPropertyValue(selector, "count");
         return parseInt(countText, 10);
     }
 
-    async getCategoryCount(category: string): Promise<number> {
+    async getCategoryCount(category: CategoryTab): Promise<number> {
         const selector = this.getCategoryTabSelector(category);
         const countText = await ui5.element.getPropertyValue(selector, "count");
         return parseInt(countText, 10);

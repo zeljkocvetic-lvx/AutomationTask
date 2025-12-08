@@ -5,6 +5,7 @@ import ProductTablePage from '../pages/ProductTablePage.js';
 import ProductDetailsPage from '../pages/ProductDetailsPage.js';
 import type { Product } from '../interfaces/productInterface.js';
 import type { ProductCounts } from '../interfaces/productCounts.js';
+import { CategoryDisplayNameMap } from '../types/categoryTab.js';
 
 // Background
 Given('Open the app', async function () {
@@ -14,7 +15,8 @@ Given('Open the app', async function () {
 
 // Scenario 1 - Product Info Consistency
 When('Open the {string} category tab', async function (category: string) {
-    await WorklistPage.openCategoryTab(category);
+    const categoryTab = CategoryDisplayNameMap[category];
+    await WorklistPage.openCategoryTab(categoryTab);
     await attachScreenshot(`Opened ${category} category tab`);
 });
 
@@ -43,7 +45,8 @@ Then('Verify product details page displays matching information for all fields',
 
 // // Scenario 2 - Product Order Flow
 // Given('Open the {string} category tab', async function (category: string) {
-//     await WorklistPage.openCategoryTab(category);
+//     const categoryTab = CategoryDisplayNameMap[category];
+//     await WorklistPage.openCategoryTab(categoryTab);
 
 //     await attachScreenshot(`Opened ${category} category tab`);
 // });
@@ -59,7 +62,8 @@ Then('Verify product details page displays matching information for all fields',
 // });
 
 // Then('Click the {string} category tab', async function (category: string) {
-//     await WorklistPage.openCategoryTab(category);
+//     const categoryTab = CategoryDisplayNameMap[category];
+//     await WorklistPage.openCategoryTab(categoryTab);
 
 //     await attachScreenshot(`Clicked ${category} category tab`);
 // });
@@ -78,7 +82,8 @@ Then('Verify product details page displays matching information for all fields',
 // // Scenario 3 - Product Deletion
 // Given('Note the total products count and {string} category count', async function (category: string) {
 //     const totalCount = await WorklistPage.getTotalProductsCount();
-//     const categoryCount = await WorklistPage.getCategoryCount(category);
+//     const categoryTab = CategoryDisplayNameMap[category];
+//     const categoryCount = await WorklistPage.getCategoryCount(categoryTab);
 //     const counts: ProductCounts = { total: totalCount, category: categoryCount };
 //     this.setProductCounts(counts);
 
@@ -107,7 +112,8 @@ Then('Verify product details page displays matching information for all fields',
 
 // Then('Verify the {string} category count decreased by {int}', async function (category: string, decreaseAmount: number) {
 //     const originalCounts = this.getProductCounts();
-//     const currentCategoryCount = await WorklistPage.getCategoryCount(category);
+//     const categoryTab = CategoryDisplayNameMap[category];
+//     const currentCategoryCount = await WorklistPage.getCategoryCount(categoryTab);
 //     const expectedCategoryCount = originalCounts.category - decreaseAmount;
 
 //     await common.assertion.expectEqual(currentCategoryCount, expectedCategoryCount);
