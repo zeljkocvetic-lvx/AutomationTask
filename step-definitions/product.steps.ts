@@ -1,7 +1,6 @@
 import { Given, When, Then } from '@wdio/cucumber-framework';
 import { attachScreenshot } from '../helpers/screenShotHelper.js';
 import WorklistPage from '../pages/WorklistPage.js';
-import ProductTablePage from '../pages/ProductTablePage.js';
 import ProductDetailsPage from '../pages/ProductDetailsPage.js';
 import type { Product } from '../interfaces/productInterface.js';
 import type { ProductCounts } from '../interfaces/productCounts.js';
@@ -21,12 +20,12 @@ When('Open the {string} category tab', async function (category: string) {
 });
 
 When('Get {string} product details', async function (productName: string) {
-    const product = await ProductTablePage.getProductDetails(productName);
+    const product = await WorklistPage.getProductDetails(productName);
     this.addProductToStorage(product);
 });
 
 When('Open {string} product page', async function (productName: string) {
-    await ProductTablePage.clickProduct(productName);
+    await WorklistPage.clickProduct(productName);
     await ProductDetailsPage.waitForPageLoaded();
     await attachScreenshot(`Opened product page for "${productName}"`);
 });
@@ -53,7 +52,7 @@ Then('Verify product details page displays matching information for all fields',
 // When('Order the selected product', async function () {
 //     const selectedProduct = this.getSelectedProduct();
 
-//     await WorklistPage.selectProductCheckboxByName(selectedProduct.name, (name) => ProductTablePage.findProductIndexByName(name));
+//     await WorklistPage.selectProductCheckboxByName(selectedProduct.name, (name) => WorklistPage.findProductIndexByName(name));
 //     await WorklistPage.clickOrderButton();
 //     await WorklistPage.waitForPageLoaded();
 
@@ -69,7 +68,7 @@ Then('Verify product details page displays matching information for all fields',
 
 // Then('Verify the product appears in the list with increased units', async function () {
 //     const originalProduct = this.getSelectedProduct();
-//     const currentProduct = await ProductTablePage.findProductDetailsByName(originalProduct.name);
+//     const currentProduct = await WorklistPage.findProductDetailsByName(originalProduct.name);
 //     const originalUnits = parseFloat(originalProduct.unitsInStock);
 //     const currentUnits = parseFloat(currentProduct.unitsInStock);
 
@@ -92,7 +91,7 @@ Then('Verify product details page displays matching information for all fields',
 // When('Delete the selected product', async function () {
 //     const selectedProduct = this.getSelectedProduct();
 
-//     await WorklistPage.selectProductCheckboxByName(selectedProduct.name, (name) => ProductTablePage.findProductIndexByName(name));
+//     await WorklistPage.selectProductCheckboxByName(selectedProduct.name, (name) => WorklistPage.findProductIndexByName(name));
 //     await WorklistPage.clickRemoveButtonByIndex(0);
 //     await WorklistPage.waitForPageLoaded();
 
@@ -122,15 +121,15 @@ Then('Verify product details page displays matching information for all fields',
 
 // Then('Verify the product is not displayed in any listing', async function () {
 //     const deletedProduct = this.getSelectedProduct();
-//     const isInAllTab = await ProductTablePage.isProductInList(deletedProduct.name);
+//     const isInAllTab = await WorklistPage.isProductInList(deletedProduct.name);
 
 //     await WorklistPage.clickShortageTab();
 //     await WorklistPage.waitForPageLoaded();
-//     const isInShortageTab = await ProductTablePage.isProductInList(deletedProduct.name);
+//     const isInShortageTab = await WorklistPage.isProductInList(deletedProduct.name);
 
 //     await WorklistPage.clickPlentyInStockTab();
 //     await WorklistPage.waitForPageLoaded();
-//     const isInPlentyTab = await ProductTablePage.isProductInList(deletedProduct.name);
+//     const isInPlentyTab = await WorklistPage.isProductInList(deletedProduct.name);
 
 //     await common.assertion.expectFalse(isInAllTab);
 //     await common.assertion.expectFalse(isInShortageTab);
@@ -152,13 +151,13 @@ Then('Verify product details page displays matching information for all fields',
 // Then('Verify only products matching the search query are displayed', async function () {
 //     const selectedProduct = this.getSelectedProduct();
 
-//     await ProductTablePage.verifyAllProductsMatchSearchTerm(selectedProduct.name);
+//     await WorklistPage.verifyAllProductsMatchSearchTerm(selectedProduct.name);
 
 //     await attachScreenshot(`Verified all products match search term: "${selectedProduct.name}"`);
 // });
 
 // Then('Verify the result count is {int}', async function (expectedCount: number) {
-//     const actualCount = await ProductTablePage.getVisibleProductCount();
+//     const actualCount = await WorklistPage.getVisibleProductCount();
 
 //     await common.assertion.expectEqual(actualCount, expectedCount);
 
