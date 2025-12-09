@@ -154,21 +154,6 @@ class WorklistPage extends BasePage {
         };
     }
 
-    private getScopedSelectorByProductName(baseSelector: QmateSelector, productName: string): QmateSelector {
-        return {
-            elementProperties: (baseSelector as any).elementProperties,
-            ancestorProperties: {
-                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                metadata: "sap.m.ColumnListItem",
-                descendantProperties: {
-                    metadata: "sap.m.ObjectIdentifier",
-                    viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                    title: productName
-                }
-            }
-        } as QmateSelector;
-    }
-
     async getProductName(index: number = 0): Promise<string> {
         return await ui5.element.getPropertyValue(WorklistPage.PRODUCT_NAME_SELECTOR, "title", index);
     }
@@ -189,23 +174,33 @@ class WorklistPage extends BasePage {
         const rowSelector = this.getTableRowSelectorByName(productName);
         await ui5.element.getDisplayed(rowSelector);
 
-        const supplier = await ui5.element.getPropertyValue(
-            this.getScopedSelectorByProductName(WorklistPage.PRODUCT_SUPPLIER_SELECTOR, productName),
-            "text",
-            0
-        );
+        const supplierSelector: QmateSelector = {
+            elementProperties: (WorklistPage.PRODUCT_SUPPLIER_SELECTOR as any).elementProperties,
+            ancestorProperties: {
+                ...(rowSelector as any).elementProperties,
+                descendantProperties: (rowSelector as any).descendantProperties
+            }
+        } as QmateSelector;
 
-        const price = await ui5.element.getPropertyValue(
-            this.getScopedSelectorByProductName(WorklistPage.PRODUCT_PRICE_SELECTOR, productName),
-            "number",
-            0
-        );
+        const priceSelector: QmateSelector = {
+            elementProperties: (WorklistPage.PRODUCT_PRICE_SELECTOR as any).elementProperties,
+            ancestorProperties: {
+                ...(rowSelector as any).elementProperties,
+                descendantProperties: (rowSelector as any).descendantProperties
+            }
+        } as QmateSelector;
 
-        const unitsInStock = await ui5.element.getPropertyValue(
-            this.getScopedSelectorByProductName(WorklistPage.PRODUCT_UNITS_SELECTOR, productName),
-            "number",
-            0
-        );
+        const unitsSelector: QmateSelector = {
+            elementProperties: (WorklistPage.PRODUCT_UNITS_SELECTOR as any).elementProperties,
+            ancestorProperties: {
+                ...(rowSelector as any).elementProperties,
+                descendantProperties: (rowSelector as any).descendantProperties
+            }
+        } as QmateSelector;
+
+        const supplier = await ui5.element.getPropertyValue(supplierSelector, "text", 0);
+        const price = await ui5.element.getPropertyValue(priceSelector, "number", 0);
+        const unitsInStock = await ui5.element.getPropertyValue(unitsSelector, "number", 0);
 
         return { name: productName, supplier, price, unitsInStock };
     }
