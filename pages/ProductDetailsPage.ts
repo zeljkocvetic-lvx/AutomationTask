@@ -3,14 +3,6 @@ import { BasePage } from './BasePage.js';
 import type { Product } from '../interfaces/productInterface.js';
 
 class ProductDetailsPage extends BasePage {
-    private static readonly PAGE_TITLE_SELECTOR: QmateSelector = {
-        elementProperties: {
-            viewName: "mycompany.myapp.MyWorklistApp.view.Object",
-            metadata: "sap.f.DynamicPageTitle",
-            id: "*page-pageTitle"
-        }
-    };
-
     private static readonly PRODUCT_NAME_SELECTOR: QmateSelector = {
         elementProperties: {
             viewName: "mycompany.myapp.MyWorklistApp.view.Object",
@@ -43,7 +35,7 @@ class ProductDetailsPage extends BasePage {
     };
 
     async waitForPageLoaded(): Promise<void> {
-        await ui5.element.getDisplayed(ProductDetailsPage.PAGE_TITLE_SELECTOR);
+        await ui5.element.getDisplayed(ProductDetailsPage.PRODUCT_NAME_SELECTOR);
     }
 
     async getProductName(): Promise<string> {
