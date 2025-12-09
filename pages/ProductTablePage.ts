@@ -68,25 +68,56 @@ class ProductTablePage {
         const rowSelector = this.getTableRowSelectorByName(productName);
         await ui5.element.getDisplayed(rowSelector);
 
-        const allRows = await ui5.element.getAllDisplayed({
+        const supplier = await ui5.element.getPropertyValue({
             elementProperties: {
                 viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                metadata: "sap.m.ColumnListItem"
+                metadata: "sap.m.Text",
+                text: [{ path: "Supplier/CompanyName" }]
+            },
+            ancestorProperties: {
+                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                metadata: "sap.m.ColumnListItem",
+                descendantProperties: {
+                    metadata: "sap.m.ObjectIdentifier",
+                    viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                    title: productName
+                }
             }
-        });
+        }, "text", 0);
 
-        let rowIndex = -1;
-        for (let i = 0; i < allRows.length; i++) {
-            const name = await ui5.element.getPropertyValue(ProductTablePage.PRODUCT_NAME_SELECTOR, "title", i);
-            if (name === productName) {
-                rowIndex = i;
-                break;
+        const price = await ui5.element.getPropertyValue({
+            elementProperties: {
+                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                metadata: "sap.m.ObjectNumber",
+                number: [{ path: "UnitPrice" }]
+            },
+            ancestorProperties: {
+                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                metadata: "sap.m.ColumnListItem",
+                descendantProperties: {
+                    metadata: "sap.m.ObjectIdentifier",
+                    viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                    title: productName
+                }
             }
-        }
+        }, "number", 0);
 
-        const supplier = await this.getProductSupplier(rowIndex);
-        const price = await this.getProductPrice(rowIndex);
-        const unitsInStock = await this.getProductUnitsInStock(rowIndex);
+        const unitsInStock = await ui5.element.getPropertyValue({
+            elementProperties: {
+                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                metadata: "sap.m.ObjectNumber",
+                number: [{ path: "UnitsInStock" }]
+            },
+            ancestorProperties: {
+                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                metadata: "sap.m.ColumnListItem",
+                descendantProperties: {
+                    metadata: "sap.m.ObjectIdentifier",
+                    viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                    title: productName
+                }
+            }
+        }, "number", 0);
 
         return { name: productName, supplier, price, unitsInStock };
     }
