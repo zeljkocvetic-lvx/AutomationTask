@@ -154,6 +154,21 @@ class WorklistPage extends BasePage {
         };
     }
 
+    private getScopedSelectorByProductName(baseSelector: QmateSelector, productName: string): QmateSelector {
+        return {
+            elementProperties: (baseSelector as any).elementProperties,
+            ancestorProperties: {
+                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                metadata: "sap.m.ColumnListItem",
+                descendantProperties: {
+                    metadata: "sap.m.ObjectIdentifier",
+                    viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
+                    title: productName
+                }
+            }
+        } as QmateSelector;
+    }
+
     async getProductName(index: number = 0): Promise<string> {
         return await ui5.element.getPropertyValue(WorklistPage.PRODUCT_NAME_SELECTOR, "title", index);
     }
@@ -174,56 +189,23 @@ class WorklistPage extends BasePage {
         const rowSelector = this.getTableRowSelectorByName(productName);
         await ui5.element.getDisplayed(rowSelector);
 
-        const supplier = await ui5.element.getPropertyValue({
-            elementProperties: {
-                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                metadata: "sap.m.Text",
-                text: [{ path: "Supplier/CompanyName" }]
-            },
-            ancestorProperties: {
-                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                metadata: "sap.m.ColumnListItem",
-                descendantProperties: {
-                    metadata: "sap.m.ObjectIdentifier",
-                    viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                    title: productName
-                }
-            }
-        }, "text", 0);
+        const supplier = await ui5.element.getPropertyValue(
+            this.getScopedSelectorByProductName(WorklistPage.PRODUCT_SUPPLIER_SELECTOR, productName),
+            "text",
+            0
+        );
 
-        const price = await ui5.element.getPropertyValue({
-            elementProperties: {
-                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                metadata: "sap.m.ObjectNumber",
-                number: [{ path: "UnitPrice" }]
-            },
-            ancestorProperties: {
-                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                metadata: "sap.m.ColumnListItem",
-                descendantProperties: {
-                    metadata: "sap.m.ObjectIdentifier",
-                    viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                    title: productName
-                }
-            }
-        }, "number", 0);
+        const price = await ui5.element.getPropertyValue(
+            this.getScopedSelectorByProductName(WorklistPage.PRODUCT_PRICE_SELECTOR, productName),
+            "number",
+            0
+        );
 
-        const unitsInStock = await ui5.element.getPropertyValue({
-            elementProperties: {
-                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                metadata: "sap.m.ObjectNumber",
-                number: [{ path: "UnitsInStock" }]
-            },
-            ancestorProperties: {
-                viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                metadata: "sap.m.ColumnListItem",
-                descendantProperties: {
-                    metadata: "sap.m.ObjectIdentifier",
-                    viewName: "mycompany.myapp.MyWorklistApp.view.Worklist",
-                    title: productName
-                }
-            }
-        }, "number", 0);
+        const unitsInStock = await ui5.element.getPropertyValue(
+            this.getScopedSelectorByProductName(WorklistPage.PRODUCT_UNITS_SELECTOR, productName),
+            "number",
+            0
+        );
 
         return { name: productName, supplier, price, unitsInStock };
     }
